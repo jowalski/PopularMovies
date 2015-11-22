@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -15,6 +16,8 @@ import java.util.Arrays;
 public class MainActivityFragment extends Fragment {
 
     private MoviePosterAdapter movieAdapter;
+
+    private ArrayList<MoviePoster> moviePosterList;
 
     MoviePoster[] moviePosters = {
             new MoviePoster("Spectre", R.drawable.spectre),
@@ -27,7 +30,24 @@ public class MainActivityFragment extends Fragment {
                     R.drawable.thehobbitthebattleofthefivearmies)
     };
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
+            moviePosterList = new ArrayList<MoviePoster>(Arrays.asList(moviePosters));
+        }
+        else {
+            moviePosterList = savedInstanceState.getParcelableArrayList("movies");
+        }
+    }
+
     public MainActivityFragment() {
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("movies", moviePosterList);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -41,6 +61,5 @@ public class MainActivityFragment extends Fragment {
         gridView.setAdapter(movieAdapter);
 
         return rootView;
-
     }
 }
