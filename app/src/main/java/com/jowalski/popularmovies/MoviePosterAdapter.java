@@ -28,7 +28,7 @@ public class MoviePosterAdapter extends ArrayAdapter<MoviePoster> {
         // If not, this view already has the layout inflated from a previous call to getView,
         // and we modify the View widgets as usual.
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_movie, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.movie_poster_item, parent, false);
         }
 
         ImageView iconView = (ImageView) convertView.findViewById(R.id.grid_item_icon);
