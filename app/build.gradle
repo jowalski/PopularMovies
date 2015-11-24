@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+// TheMovieDBAPIKey can be defined in the developer's gradle.properties file, in
+// $HOME/.gradle with 'TheMovieDBAPIKey=[APIKey]'
+// and used in project code by accessing the variable 'BuildConfig.THE_MOVIE_DB_API_KEY'
+def THE_MOVIE_DB_API_KEY = '"' + TheMovieDBAPIKey + '"' ?: '"Missing The Movie DB API Key"';
+
 android {
     compileSdkVersion 22
     buildToolsVersion "21.1.2"
@@ -15,6 +20,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        all {
+            buildConfigField 'String', 'THE_MOVIE_DB_API_KEY', THE_MOVIE_DB_API_KEY
         }
     }
 }
