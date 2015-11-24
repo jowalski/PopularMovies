@@ -12,16 +12,16 @@ import java.util.List;
 /**
  * Created by jowalski on 11/20/15.
  */
-public class MoviePosterAdapter extends ArrayAdapter<MoviePoster> {
-    private static final String LOG_TAG = MoviePosterAdapter.class.getSimpleName();
+public class MovieAdapter extends ArrayAdapter<Movie> {
+    private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
 
-    public MoviePosterAdapter(Context context, List<MoviePoster> objects) {
+    public MovieAdapter(Context context, List<Movie> objects) {
         super(context, 0, objects);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        MoviePoster moviePoster = getItem(position);
+        Movie movie = getItem(position);
 
         // Adapters recycle views to AdapterViews.
         // If this is a new View object we're getting, then inflate the layout.
@@ -32,10 +32,10 @@ public class MoviePosterAdapter extends ArrayAdapter<MoviePoster> {
         }
 
         ImageView iconView = (ImageView) convertView.findViewById(R.id.grid_item_icon);
-        iconView.setImageResource(moviePoster.image);
+        iconView.setImageResource(movie.image);
 
 //        TextView versionNameView = (TextView) convertView.findViewById(R.id.grid_item_movie_name);
-//        versionNameView.setText(moviePoster.movieName);
+//        versionNameView.setText(movie.movieName);
 
         return convertView;
 

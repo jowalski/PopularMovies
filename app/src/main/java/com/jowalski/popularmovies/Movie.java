@@ -6,16 +6,16 @@ import android.os.Parcelable;
 /**
  * Created by jowalski on 11/20/15.
  */
-public class MoviePoster implements Parcelable {
+public class Movie implements Parcelable {
     String movieName;
     int image;
 
-    public MoviePoster(String movieName, int image) {
+    public Movie(String movieName, int image) {
         this.movieName = movieName;
         this.image = image;
     }
 
-    private MoviePoster(Parcel in) {
+    private Movie(Parcel in) {
         movieName = in.readString();
         image = in.readInt();
     }
@@ -27,7 +27,7 @@ public class MoviePoster implements Parcelable {
 
     @Override
     public String toString() {
-        return "MoviePoster{" +
+        return "Movie{" +
                 "movieName='" + movieName + '\'' +
                 ", image=" + image +
                 '}';
@@ -39,15 +39,15 @@ public class MoviePoster implements Parcelable {
         parcel.writeInt(image);
     }
 
-    public final Parcelable.Creator<MoviePoster> CREATOR = new Parcelable.Creator<MoviePoster>() {
+    public final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         @Override
-        public MoviePoster createFromParcel(Parcel parcel) {
-            return new MoviePoster(parcel);
+        public Movie createFromParcel(Parcel parcel) {
+            return new Movie(parcel);
         }
 
         @Override
-        public MoviePoster[] newArray(int i) {
-            return new MoviePoster[i];
+        public Movie[] newArray(int i) {
+            return new Movie[i];
         }
     };
 }

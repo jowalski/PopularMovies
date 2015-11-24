@@ -15,18 +15,18 @@ import java.util.Arrays;
  */
 public class MainActivityFragment extends Fragment {
 
-    private MoviePosterAdapter movieAdapter;
+    private MovieAdapter movieAdapter;
 
-    private ArrayList<MoviePoster> moviePosterList;
+    private ArrayList<Movie> movieList;
 
-    MoviePoster[] moviePosters = {
-            new MoviePoster("Spectre", R.drawable.spectre),
-            new MoviePoster("Ant-man", R.drawable.antman),
-            new MoviePoster("Jurassic World", R.drawable.jurassicworld),
-            new MoviePoster("Fantastic Four", R.drawable.fantasticfour),
-            new MoviePoster("Minions", R.drawable.minions),
-            new MoviePoster("Terminator Genisys", R.drawable.terminatorgenisys),
-            new MoviePoster("The Hobbit: the Battle of the Five Armies",
+    Movie[] movies = {
+            new Movie("Spectre", R.drawable.spectre),
+            new Movie("Ant-man", R.drawable.antman),
+            new Movie("Jurassic World", R.drawable.jurassicworld),
+            new Movie("Fantastic Four", R.drawable.fantasticfour),
+            new Movie("Minions", R.drawable.minions),
+            new Movie("Terminator Genisys", R.drawable.terminatorgenisys),
+            new Movie("The Hobbit: the Battle of the Five Armies",
                     R.drawable.thehobbitthebattleofthefivearmies)
     };
 
@@ -34,10 +34,10 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
-            moviePosterList = new ArrayList<MoviePoster>(Arrays.asList(moviePosters));
+            movieList = new ArrayList<Movie>(Arrays.asList(movies));
         }
         else {
-            moviePosterList = savedInstanceState.getParcelableArrayList("movies");
+            movieList = savedInstanceState.getParcelableArrayList("movies");
         }
     }
 
@@ -46,7 +46,7 @@ public class MainActivityFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("movies", moviePosterList);
+        outState.putParcelableArrayList("movies", movieList);
         super.onSaveInstanceState(outState);
     }
 
@@ -55,7 +55,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        movieAdapter = new MoviePosterAdapter(getActivity(), Arrays.asList(moviePosters));
+        movieAdapter = new MovieAdapter(getActivity(), Arrays.asList(movies));
 
         GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movies);
         gridView.setAdapter(movieAdapter);
