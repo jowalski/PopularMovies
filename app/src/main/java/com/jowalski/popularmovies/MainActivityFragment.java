@@ -2,6 +2,7 @@ package com.jowalski.popularmovies;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,34 +13,41 @@ import android.widget.GridView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment implements FetchMoviesListener {
+    private static final String TAG = MainActivityFragment.class.getSimpleName();
+    private static final long FETCH_MOVIES_MAX_WAIT = 3;
 
     private MovieAdapter movieAdapter;
 
     private ArrayList<Movie> movieList;
 
-    Movie[] movies = {
-            new Movie("Spectre", R.drawable.spectre),
-            new Movie("Ant-man", R.drawable.antman),
-            new Movie("Jurassic World", R.drawable.jurassicworld),
-            new Movie("Fantastic Four", R.drawable.fantasticfour),
-            new Movie("Minions", R.drawable.minions),
-            new Movie("Terminator Genisys", R.drawable.terminatorgenisys),
-            new Movie("The Hobbit: the Battle of the Five Armies",
-                    R.drawable.thehobbitthebattleofthefivearmies)
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
-            movieList = new ArrayList<Movie>(Arrays.asList(movies));
-        }
-        else {
+            FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(this);
+            fetchMoviesTask.execute();
+
+            Movie[] movies = null;
+            try {
+                movies = fetchMoviesTask.get(FETCH_MOVIES_MAX_WAIT, TimeUnit.SECONDS);
+            } catch (TimeoutException | InterruptedException | ExecutionException e) {
+                Log.e(TAG, "onCreate: FetchMoviesTask error", e);
+            }
+
+            if (movies == null) {
+                movieList = new ArrayList<Movie>();
+            } else {
+                movieList = new ArrayList<Movie>(Arrays.asList(movies));
+            }
+        } else {
             movieList = savedInstanceState.getParcelableArrayList("movies");
         }
         setHasOptionsMenu(true);
@@ -78,6 +86,8 @@ public class MainActivityFragment extends Fragment implements FetchMoviesListene
         GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movies);
         gridView.setAdapter(movieAdapter);
 
+        updateMovies();
+
         return rootView;
     }
 
@@ -88,10 +98,12 @@ public class MainActivityFragment extends Fragment implements FetchMoviesListene
 
     @Override
     public void onFetchMoviesComplete(Movie[] movies) {
-        movieList = new ArrayList<Movie>(Arrays.asList(movies));
-        movieAdapter.clear();
-        for (int i = 0; i < movies.length; i++) {
-            movieAdapter.add(movies[i]);
+        if (movies != null) {
+            movieList = new ArrayList<Movie>(Arrays.asList(movies));
+            movieAdapter.clear();
+            for (int i = 0; i < movies.length; i++) {
+                movieAdapter.add(movieList.get(i));
+            }
         }
     }
 }
