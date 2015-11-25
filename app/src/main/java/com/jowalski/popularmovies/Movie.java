@@ -41,7 +41,6 @@ public class Movie implements Parcelable {
         origTitle = movieJson.getString(TMDB_ORIG_TITLE);
         overview = movieJson.getString(TMDB_OVERVIEW);
         releaseDate = movieJson.getString(TMDB_RELEASE_DATE);
-        posterPath = movieJson.getString(TMDB_POSTER_PATH);
         popularity = movieJson.getDouble(TMDB_POPULARITY);
         title = movieJson.getString(TMDB_TITLE);
         vote_average = movieJson.getDouble(TMDB_VOTE_AVG);
@@ -49,6 +48,21 @@ public class Movie implements Parcelable {
 
         movieName = title;
         image = movieId;
+
+        // fields for constructing the posterPath
+        final String THE_MOVIE_DB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
+
+        // these are all (?) possible image sizes
+        final String POSTER_SIZE_W92 = "w92";
+        final String POSTER_SIZE_W154 = "w154";
+        final String POSTER_SIZE_W185 = "w185";
+        final String POSTER_SIZE_W342 = "w342";
+        final String POSTER_SIZE_W500 = "w500";
+        final String POSTER_SIZE_W780 = "w780";
+        final String POSTER_SIZE_ORIG = "original";
+
+        posterPath = THE_MOVIE_DB_BASE_IMAGE_URL + POSTER_SIZE_W185 +
+                movieJson.getString(TMDB_POSTER_PATH);
     }
 
     public Movie(String movieName, int image) {

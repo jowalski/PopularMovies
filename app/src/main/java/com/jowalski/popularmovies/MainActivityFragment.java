@@ -3,6 +3,9 @@ package com.jowalski.popularmovies;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -13,7 +16,7 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements FetchMoviesListener {
 
     private MovieAdapter movieAdapter;
 
@@ -39,6 +42,21 @@ public class MainActivityFragment extends Fragment {
         else {
             movieList = savedInstanceState.getParcelableArrayList("movies");
         }
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.movie_poster_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            updateMovies();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public MainActivityFragment() {
@@ -55,11 +73,25 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        movieAdapter = new MovieAdapter(getActivity(), Arrays.asList(movies));
+        movieAdapter = new MovieAdapter(getActivity(), movieList);
 
         GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movies);
         gridView.setAdapter(movieAdapter);
 
         return rootView;
+    }
+
+    private void updateMovies() {
+        FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(this);
+        fetchMoviesTask.execute();
+    }
+
+    @Override
+    public void onFetchMoviesComplete(Movie[] movies) {
+        movieList = new ArrayList<Movie>(Arrays.asList(movies));
+        movieAdapter.clear();
+        for (int i = 0; i < movies.length; i++) {
+            movieAdapter.add(movies[i]);
+        }
     }
 }

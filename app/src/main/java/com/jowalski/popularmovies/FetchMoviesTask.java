@@ -21,6 +21,11 @@ import java.net.URL;
 public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
 
     private static final String TAG = FetchMoviesTask.class.getSimpleName();
+    private FetchMoviesListener listener;
+
+    public FetchMoviesTask(FetchMoviesListener listener) {
+        this.listener = listener;
+    }
 
     @Override
     protected Movie[] doInBackground(Void... voids) {
@@ -45,18 +50,8 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
             final String SORT_BY_VALUE_VOTE = "vote_average.desc";
             final String API_KEY_PARAM = "api_key";
 
-            final String THE_MOVIE_DB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
-
-            final String POSTER_SIZE_W92 = "w92";
-            final String POSTER_SIZE_W154 = "w154";
-            final String POSTER_SIZE_W185 = "w185";
-            final String POSTER_SIZE_W342 = "w342";
-            final String POSTER_SIZE_W500 = "w500";
-            final String POSTER_SIZE_W780 = "w780";
-            final String POSTER_SIZE_ORIG = "original";
-
             String base_url = THE_MOVIE_DB_BASE_API_URL +
-                    DISCOVER_MOVIE_ENDPOINT + "/?";
+                    DISCOVER_MOVIE_ENDPOINT + "?";
 
             String sort_by_value = SORT_BY_VALUE_POP;
             switch (sort_by) {
@@ -102,7 +97,8 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
         } catch (IOException e) {
             Log.e(TAG, "Could not fetch the movie data", e);
         } catch (JSONException e) {
-
+            Log.e(TAG, e.getMessage(), e);
+            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -141,10 +137,18 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
                 moviesArray[i] = new Movie(movieJson);
             }
             Log.d(TAG, "FetchMoviesTask Complete. ");
+            return moviesArray;
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage(), e);
             e.printStackTrace();
         }
-        return moviesArray;
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Movie[] movies) {
+        super.onPostExecute(movies);
+
+        listener.onFetchMoviesComplete(movies);
     }
 }
