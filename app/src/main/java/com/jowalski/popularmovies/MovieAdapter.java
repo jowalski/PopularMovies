@@ -1,6 +1,7 @@
 package com.jowalski.popularmovies;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,8 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 /**
- * Created by jowalski on 11/20/15.
+ * An ArrayAdapter for the Movie class that uses the Picasso library to
+ * download a movie poster, if it's not already cached, and create an ImageView.
  */
 public class MovieAdapter extends ArrayAdapter<Movie> {
     private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
@@ -40,6 +42,8 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
                 .load(movie.posterPath)
                 .into(iconView);
 
+        Log.d(LOG_TAG, "getView: Loaded movie poster for" + movie.title +
+                " from " + movie.posterPath);
         return convertView;
     }
 }
