@@ -3,16 +3,17 @@ apply plugin: 'com.android.application'
 // TheMovieDBAPIKey can be defined in the developer's gradle.properties file, in
 // $HOME/.gradle with 'TheMovieDBAPIKey=[APIKey]'
 // and used in project code by accessing the variable 'BuildConfig.THE_MOVIE_DB_API_KEY'
+//noinspection GroovyAssignabilityCheck
 def THE_MOVIE_DB_API_KEY = '"' + TheMovieDBAPIKey + '"' ?: '"Missing The Movie DB API Key"';
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 23
     buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "com.jowalski.popularmovies"
         minSdkVersion 10
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -30,8 +31,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:design:22.2.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
 }
 
