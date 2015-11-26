@@ -2,4 +2,6 @@
     <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
     <string name="action_refresh">Refresh</string>
+    <string name="sort_by_rating">Sort By Rating</string>
+    <string name="movie_poster_desc">Movie Poster Image</string>
 </resources>

@@ -5,4 +5,8 @@
         android:id="@+id/action_refresh"
         android:title="@string/action_refresh"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/sort_by_rating_checkbox"
+        android:title="@string/sort_by_rating"
+        android:checkable="true" />
 </menu>
