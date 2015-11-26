@@ -43,9 +43,9 @@ public class MainActivityFragment extends Fragment implements FetchMoviesListene
             }
 
             if (movies == null) {
-                movieList = new ArrayList<Movie>();
+                movieList = new ArrayList<>();
             } else {
-                movieList = new ArrayList<Movie>(Arrays.asList(movies));
+                movieList = new ArrayList<>(Arrays.asList(movies));
             }
         } else {
             movieList = savedInstanceState.getParcelableArrayList("movies");
@@ -99,7 +99,7 @@ public class MainActivityFragment extends Fragment implements FetchMoviesListene
     @Override
     public void onFetchMoviesComplete(Movie[] movies) {
         if (movies != null) {
-            movieList = new ArrayList<Movie>(Arrays.asList(movies));
+            movieList = new ArrayList<>(Arrays.asList(movies));
             movieAdapter.clear();
             for (int i = 0; i < movies.length; i++) {
                 movieAdapter.add(movieList.get(i));
