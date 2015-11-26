@@ -16,12 +16,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by jowalski on 11/23/15.
+ * An AsyncTask for fetching movie info from theMovieDb. On completion
+ * it returns parsed Json info as an array of Movie objects (Movie[])
+ * through the onFetchMoviesComplete() method.
  */
 public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
 
     private static final String TAG = FetchMoviesTask.class.getSimpleName();
-    private FetchMoviesListener listener;
+    private final FetchMoviesListener listener;
 
     public FetchMoviesTask(FetchMoviesListener listener) {
         this.listener = listener;
@@ -75,7 +77,7 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
 
             // Read the input stream
             InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             if (inputStream == null) {
                 return null;
             }
@@ -84,7 +86,8 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
             String line;
             while ((line = reader.readLine()) != null) {
                 // adding a newline to make debugging easier
-                buffer.append(line + "\n");
+                buffer.append(line)
+                        .append("\n");
             }
 
             if (buffer.length() == 0) {
@@ -96,9 +99,6 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
             moviesArray = getMoviesInfoFromJson(moviesJsonStr);
         } catch (IOException e) {
             Log.e(TAG, "Could not fetch the movie data", e);
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage(), e);
-            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -114,7 +114,7 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
         return moviesArray;
     }
 
-    private Movie[] getMoviesInfoFromJson(String moviesJsonStr) throws JSONException {
+    private Movie[] getMoviesInfoFromJson(String moviesJsonStr)  {
         // each Json result consists of these top-level elements,
         // the 'results' field contains the movie info elements
         final String TMDB_RESULTS = "results";
@@ -123,7 +123,7 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
         // final String TMDB_TOT_PAGES = "total_pages";
         // final String TMDB_TOT_RESULTS = "total_results";
 
-        Movie[] moviesArray = null;
+        Movie[] moviesArray;
         try {
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesJSONArray = moviesJson.getJSONArray(TMDB_RESULTS);
