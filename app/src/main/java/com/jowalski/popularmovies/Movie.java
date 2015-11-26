@@ -7,7 +7,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by jowalski on 11/20/15.
+ * A Parcelable class containing already parsed Json data
+ * for a movie from theMovieDB.org website.
  */
 public class Movie implements Parcelable {
     String movieName;
@@ -53,21 +54,16 @@ public class Movie implements Parcelable {
         final String THE_MOVIE_DB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
 
         // these are all (?) possible image sizes
-        final String POSTER_SIZE_W92 = "w92";
-        final String POSTER_SIZE_W154 = "w154";
+        // final String POSTER_SIZE_W92 = "w92";
+        // final String POSTER_SIZE_W154 = "w154";
         final String POSTER_SIZE_W185 = "w185";
-        final String POSTER_SIZE_W342 = "w342";
-        final String POSTER_SIZE_W500 = "w500";
-        final String POSTER_SIZE_W780 = "w780";
-        final String POSTER_SIZE_ORIG = "original";
+        // final String POSTER_SIZE_W342 = "w342";
+        // final String POSTER_SIZE_W500 = "w500";
+        // final String POSTER_SIZE_W780 = "w780";
+        // final String POSTER_SIZE_ORIG = "original";
 
         posterPath = THE_MOVIE_DB_BASE_IMAGE_URL + POSTER_SIZE_W185 +
                 movieJson.getString(TMDB_POSTER_PATH);
-    }
-
-    public Movie(String movieName, int image) {
-        this.movieName = movieName;
-        this.image = image;
     }
 
     private Movie(Parcel in) {
@@ -123,6 +119,7 @@ public class Movie implements Parcelable {
         parcel.writeInt(vote_count);
     }
 
+    @SuppressWarnings("unused")
     public final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel parcel) {
