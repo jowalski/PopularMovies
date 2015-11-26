@@ -1,8 +1,10 @@
 package com.jowalski.popularmovies;
 
 /**
- * Created by jowalski on 11/24/15.
+ * A listener interface that waits for the FetchMoviesTask
+ * to complete and then calls its associated object's
+ * onFetchMoviesComplete() method.
  */
-public interface FetchMoviesListener {
+interface FetchMoviesListener {
     void onFetchMoviesComplete(Movie[] movies);
 }
