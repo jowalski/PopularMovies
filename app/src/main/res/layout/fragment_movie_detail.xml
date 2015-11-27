@@ -24,7 +24,8 @@
             android:id="@+id/movie_poster_icon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:contentDescription="@string/movie_poster_detail_desc"/>
 
         <LinearLayout
             android:layout_width="0dp"

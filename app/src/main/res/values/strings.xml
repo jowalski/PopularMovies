@@ -8,4 +8,10 @@
     <string name="rel_date_textview_text">Aug 14, 2015</string>
     <string name="rating_textview_text">8.1/10</string>
     <string name="plot_textview_text">this is plot synopsis text</string>
+    <string name="title_movie_list">Movies</string>
+    <string name="title_movie_detail">Movie Detail</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="movie_poster_detail_desc">Movie Poster Image</string>
 </resources>

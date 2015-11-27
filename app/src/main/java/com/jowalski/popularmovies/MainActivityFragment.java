@@ -1,5 +1,6 @@
 package com.jowalski.popularmovies;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.util.ArrayList;
@@ -23,6 +25,8 @@ import java.util.concurrent.TimeoutException;
 public class MainActivityFragment extends Fragment implements FetchMoviesListener {
     private static final String TAG = MainActivityFragment.class.getSimpleName();
     private static final long FETCH_MOVIES_MAX_WAIT = 3;
+    public static final String DET_ACT_MOVIE_OBJ_INTENT_KEY = "movie_obj";
+
 
     private MovieAdapter movieAdapter;
 
@@ -100,6 +104,15 @@ public class MainActivityFragment extends Fragment implements FetchMoviesListene
 
         GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movies);
         gridView.setAdapter(movieAdapter);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+                intent.putExtra(DET_ACT_MOVIE_OBJ_INTENT_KEY, movieList.get(i));
+                startActivity(intent);
+            }
+        });
 
         return rootView;
     }
