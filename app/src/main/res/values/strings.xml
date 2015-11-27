@@ -4,4 +4,8 @@
     <string name="action_refresh">Refresh</string>
     <string name="sort_by_rating">Sort By Rating</string>
     <string name="movie_poster_desc">Movie Poster Image</string>
+    <string name="title_textview_text">Title</string>
+    <string name="rel_date_textview_text">Aug 14, 2015</string>
+    <string name="rating_textview_text">8.1/10</string>
+    <string name="plot_textview_text">this is plot synopsis text</string>
 </resources>
