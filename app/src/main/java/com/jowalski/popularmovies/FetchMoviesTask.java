@@ -20,7 +20,7 @@ import java.net.URL;
  * it returns parsed Json info as an array of Movie objects (Movie[])
  * through the onFetchMoviesComplete() method.
  */
-public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
+public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrder, Void, Movie[]> {
 
     private static final String TAG = FetchMoviesTask.class.getSimpleName();
     private final FetchMoviesListener listener;
@@ -30,16 +30,11 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
     }
 
     @Override
-    protected Movie[] doInBackground(Void... voids) {
-
+    protected Movie[] doInBackground(MainActivityFragment.MovieSortOrder... movieSortOrders) {
         // need to be declared outside try/catch
         // so they can be closed in finally
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-
-        // Sort by popularity (0) or vote (1)
-        // TODO: 11/23/15 turn this into an enum
-        Integer sort_by = 0;
 
         Movie[] moviesArray = null;
 
@@ -56,10 +51,10 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Movie[]> {
                     DISCOVER_MOVIE_ENDPOINT + "?";
 
             String sort_by_value = SORT_BY_VALUE_POP;
-            switch (sort_by) {
-                case 0:  sort_by_value = SORT_BY_VALUE_POP;
+            switch (movieSortOrders[0]) {
+                case BY_POPULARITY:  sort_by_value = SORT_BY_VALUE_POP;
                     break;
-                case 1:  sort_by_value = SORT_BY_VALUE_VOTE;
+                case BY_RATING:  sort_by_value = SORT_BY_VALUE_VOTE;
                     break;
             }
 

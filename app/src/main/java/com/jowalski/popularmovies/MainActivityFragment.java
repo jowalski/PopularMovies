@@ -28,12 +28,17 @@ public class MainActivityFragment extends Fragment implements FetchMoviesListene
 
     private ArrayList<Movie> movieList;
 
+    public enum MovieSortOrder {
+        BY_POPULARITY,
+        BY_RATING
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
             FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(this);
-            fetchMoviesTask.execute();
+            fetchMoviesTask.execute(MovieSortOrder.BY_POPULARITY);
 
             Movie[] movies = null;
             try {
@@ -61,8 +66,18 @@ public class MainActivityFragment extends Fragment implements FetchMoviesListene
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            updateMovies();
+        if (id == R.id.sort_by_rating_checkbox) {
+            // TODO: 11/26/15 item.setChecked() should only be called
+            // when GridView successfully updated
+            if (!item.isChecked()) {
+                // sort by rating
+                updateMovies(MovieSortOrder.BY_RATING);
+                item.setChecked(true);
+            } else {
+                // sort by popularity
+                updateMovies(MovieSortOrder.BY_POPULARITY);
+                item.setChecked(false);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -86,14 +101,12 @@ public class MainActivityFragment extends Fragment implements FetchMoviesListene
         GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movies);
         gridView.setAdapter(movieAdapter);
 
-        updateMovies();
-
         return rootView;
     }
 
-    private void updateMovies() {
+    private void updateMovies(MovieSortOrder movieSortOrder) {
         FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(this);
-        fetchMoviesTask.execute();
+        fetchMoviesTask.execute(movieSortOrder);
     }
 
     @Override
