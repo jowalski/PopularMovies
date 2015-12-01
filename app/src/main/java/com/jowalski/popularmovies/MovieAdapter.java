@@ -42,8 +42,9 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
                 .load(movie.posterPath)
                 .into(iconView);
 
-        Log.d(LOG_TAG, "getView: Loaded movie poster for" + movie.title +
-                " from " + movie.posterPath);
+        Log.d(LOG_TAG, "getView: Loaded movie poster for " + movie.title +
+                    " from " + movie.posterPath);
+
         return convertView;
     }
 }

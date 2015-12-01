@@ -25,7 +25,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:contentDescription="@string/movie_poster_detail_desc"/>
+            android:contentDescription="@string/movie_poster_detail_desc" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -38,17 +38,34 @@
                 android:id="@+id/rel_date_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/rel_date_textview_text"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/format_rel_date"
                 android:textSize="@dimen/text_size_large" />
 
-            <TextView
-                android:id="@+id/rating_textview"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:text="@string/rating_textview_text"
-                android:textSize="@dimen/text_size_medium" />
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/rating_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/format_rating"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/text_size_medium" />
+
+                <TextView
+                    android:id="@+id/rating_out_of_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/format_rating_out_of"
+                    android:textSize="@dimen/text_size_medium" />
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
@@ -58,8 +75,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
-        android:padding="8dp"
+        android:padding="16dp"
         android:text="@string/plot_textview_text"
-        android:textSize="@dimen/text_size_normal" />
+        android:textSize="@dimen/text_size_normal"
+        android:ellipsize="end"
+        android:textIsSelectable="true" />
 
 </LinearLayout>
