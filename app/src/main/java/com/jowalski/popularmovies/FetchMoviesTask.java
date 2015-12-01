@@ -25,6 +25,47 @@ public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrd
     private static final String TAG = FetchMoviesTask.class.getSimpleName();
     private final FetchMoviesListener listener;
 
+    final String THE_MOVIE_DB_BASE_API_URL = "https://api.themoviedb.org/3/";
+    final String DISCOVER_MOVIE_ENDPOINT = "discover/movie";
+
+    // themoviedb api uri fields
+    final String SORT_BY_PARAM = "sort_by";
+    final String SORT_BY_VALUE_POP = "popularity.desc";
+    final String SORT_BY_VALUE_VOTE = "vote_average.desc";
+    final String API_KEY_PARAM = "api_key";
+
+    // movie info element fields
+    static final String TMDB_ID = "id";
+    static final String TMDB_ORIG_TITLE = "original_title";
+    static final String TMDB_OVERVIEW = "overview";
+    static final String TMDB_RELEASE_DATE = "release_date";
+    static final String TMDB_POSTER_PATH = "poster_path";
+    static final String TMDB_POPULARITY = "popularity";
+    static final String TMDB_TITLE = "title";
+    // TODO: 11/24/15 decide whether to use genre_ids
+    // final String TMDB_GENRE_IDS = "genre_ids";
+    static final String TMDB_VOTE_AVG = "vote_average";
+    static final String TMDB_VOTE_CNT = "vote_count";
+
+    static final int TMDB_VOTE_OUT_OF = 10;
+
+    // static final String TMDB_RELEASE_DATE_FMT = "MM/dd/yyyy";
+    static final String TMDB_DATE_FORMAT = "yyyy-MM-dd";
+    // static final SimpleDateFormat dateFormat =
+    //        new SimpleDateFormat(TMDB_RELEASE_DATE_FMT, Locale.US);
+
+    // fields for constructing the posterPath
+    static final String THE_MOVIE_DB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
+
+    // these are all (?) possible image sizes
+    // final String POSTER_SIZE_W92 = "w92";
+    // final String POSTER_SIZE_W154 = "w154";
+    static final String POSTER_SIZE_W185 = "w185";
+    // final String POSTER_SIZE_W342 = "w342";
+    // final String POSTER_SIZE_W500 = "w500";
+    // final String POSTER_SIZE_W780 = "w780";
+    // final String POSTER_SIZE_ORIG = "original";
+
     public FetchMoviesTask(FetchMoviesListener listener) {
         this.listener = listener;
     }
@@ -39,14 +80,6 @@ public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrd
         Movie[] moviesArray = null;
 
         try {
-            final String THE_MOVIE_DB_BASE_API_URL = "https://api.themoviedb.org/3/";
-            final String DISCOVER_MOVIE_ENDPOINT = "discover/movie";
-
-            final String SORT_BY_PARAM = "sort_by";
-            final String SORT_BY_VALUE_POP = "popularity.desc";
-            final String SORT_BY_VALUE_VOTE = "vote_average.desc";
-            final String API_KEY_PARAM = "api_key";
-
             String base_url = THE_MOVIE_DB_BASE_API_URL +
                     DISCOVER_MOVIE_ENDPOINT + "?";
 
@@ -129,7 +162,7 @@ public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrd
             moviesArray = new Movie[moviesJSONArray.length()];
             for (int i = 0; i < moviesJSONArray.length(); i++) {
                 JSONObject movieJson = moviesJSONArray.getJSONObject(i);
-                moviesArray[i] = new Movie(movieJson);
+                moviesArray[i] = newMovieFromJson(movieJson);
             }
             Log.d(TAG, "FetchMoviesTask Complete. ");
             return moviesArray;
@@ -138,6 +171,24 @@ public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrd
             e.printStackTrace();
         }
         return null;
+    }
+
+    private Movie newMovieFromJson(JSONObject movieJson) throws JSONException {
+        Movie movie = new Movie();
+
+        movie.movieId = movieJson.getInt(TMDB_ID);
+        movie.origTitle = movieJson.getString(TMDB_ORIG_TITLE);
+        movie.overview = movieJson.getString(TMDB_OVERVIEW);
+        movie.releaseDate = movieJson.getString(TMDB_RELEASE_DATE);
+        movie.popularity = movieJson.getDouble(TMDB_POPULARITY);
+        movie.title = movieJson.getString(TMDB_TITLE);
+        movie.vote_average = movieJson.getDouble(TMDB_VOTE_AVG);
+        movie.vote_count = movieJson.getInt(TMDB_VOTE_CNT);
+
+        movie.posterPath = THE_MOVIE_DB_BASE_IMAGE_URL + POSTER_SIZE_W185 +
+                movieJson.getString(TMDB_POSTER_PATH);
+
+        return movie;
     }
 
     @Override
