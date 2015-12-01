@@ -11,8 +11,10 @@
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:padding="16dp"
+        android:background="@color/green"
         android:text="@string/title_textview_text"
-        android:textSize="@dimen/text_size_title" />
+        android:textSize="@dimen/text_size_title"
+        android:textColor="#ffffff" />
 
     <LinearLayout
         android:layout_width="match_parent"
