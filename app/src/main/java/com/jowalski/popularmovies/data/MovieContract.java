@@ -5,7 +5,7 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-public class MoviesContract {
+public class MovieContract {
 
     public static final String CONTENT_AUTHORITY = "com.jowalski.popularmovies";
 
@@ -44,7 +44,7 @@ public class MoviesContract {
         }
 
         public static Uri buildMovieWReviewsUri(long id) {
-            return CONTENT_URI.buildUpon().appendPath(MoviesProvider.MOVIE_WREV_URI_ABR)
+            return CONTENT_URI.buildUpon().appendPath(MovieProvider.MOVIE_WREV_URI_ABR)
                     .appendPath(Long.toString(id)).build();
         }
     }
@@ -79,7 +79,7 @@ public class MoviesContract {
 
         @SuppressWarnings("unused")
         public static Uri buildReviewWithMovieId(long movieId) {
-            return CONTENT_URI.buildUpon().appendPath(MoviesProvider.MOVIE_ID_URI_ABR)
+            return CONTENT_URI.buildUpon().appendPath(MovieProvider.MOVIE_ID_URI_ABR)
                     .appendPath(Long.toString(movieId)).build();
         }
 

@@ -33,7 +33,7 @@
         </activity>
 
         <provider
-            android:name=".data.MoviesProvider"
+            android:name=".data.MovieProvider"
             android:authorities="com.jowalski.popularmovies"
             android:exported="false"
             android:syncable="true" />

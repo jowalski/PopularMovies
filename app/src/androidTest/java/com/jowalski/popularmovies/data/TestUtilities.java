@@ -20,39 +20,39 @@ public class TestUtilities extends AndroidTestCase {
 
     static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_TMDB_ID, 8382);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_ICON, 1324);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_ORIG_TITLE, "Vivre sa vie");
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_OVERVIEW,
+        movieValues.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, 8382);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_ICON, 1324);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE, "Vivre sa vie");
+        movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW,
                 "In director Jean-Luc Godard's landmark drama, Nana (Anna Karina), " +
                         "a young Parisian woman who works in a record shop, finds herself " +
                         "disillusioned by poverty and a crumbling marriage. Hoping to become " +
                         "an actress and break into films, Nana is once again disappointed " +
                         "when nothing comes of her dreams...");
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, "1962-09-20");
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH,
+        movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, "1962-09-20");
+        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH,
                 "http://static.rogerebert.com/uploads/review/primary_image/reviews/great-movie-vivre-sa-vie--my-life-to-live-1963/hero_EB20010401REVIEWS08104010301AR.jpg");
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_POPULARITY, 5.2);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_TITLE, "Vivre sa vie");
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, 7.2);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, 38254);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, 5.2);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Vivre sa vie");
+        movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, 7.2);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, 38254);
 
         return movieValues;
     }
 
     static ContentValues createReviewValues() {
         ContentValues reviewValues = new ContentValues();
-        reviewValues.put(MoviesContract.ReviewEntry.COLUMN_MOVIE_ID, 8382);
-        reviewValues.put(MoviesContract.ReviewEntry.COLUMN_AUTHOR, "Roger Ebert");
-        reviewValues.put(MoviesContract.ReviewEntry.COLUMN_CONTENT,
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_MOVIE_ID, 8382);
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_AUTHOR, "Roger Ebert");
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_CONTENT,
                 "Godard. We all went to Jean-Luc Godard in the 1960s. We stood in " +
                         "the rain outside the Three Penny Cinema, waiting for the " +
                         "next showing of \"Weekend\" (1968). One year the New York " +
                         "Film Festival showed two of his movies, or was it three?");
-        reviewValues.put(MoviesContract.ReviewEntry.COLUMN_URL,
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_URL,
                 "http://www.rogerebert.com/reviews/great-movie-vivre-sa-vie--my-life-to-live-1963");
-        reviewValues.put(MoviesContract.ReviewEntry.COLUMN_LAST_RESULTS_PAGE, 1);
-        reviewValues.put(MoviesContract.ReviewEntry.COLUMN_LAST_RESULTS_POSITION, 1);
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_LAST_RESULTS_PAGE, 1);
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_LAST_RESULTS_POSITION, 1);
 
         return reviewValues;
     }

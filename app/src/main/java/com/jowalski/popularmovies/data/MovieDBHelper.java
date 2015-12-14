@@ -5,66 +5,66 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class MoviesDBHelper extends SQLiteOpenHelper {
-    private static final String LOG_TAG = MoviesDBHelper.class.getSimpleName();
+public class MovieDBHelper extends SQLiteOpenHelper {
+    private static final String LOG_TAG = MovieDBHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME = "movies.db";
     private static final int DATABASE_VERSION = 3;
 
-    public MoviesDBHelper(Context context) {
+    public MovieDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " +
-                MoviesContract.MovieEntry.TABLE_MOVIES + "(" +
-                MoviesContract.MovieEntry.COLUMN_TMDB_ID +
+                MovieContract.MovieEntry.TABLE_MOVIES + "(" +
+                MovieContract.MovieEntry.COLUMN_TMDB_ID +
                 " INTEGER PRIMARY KEY," +
-                MoviesContract.MovieEntry.COLUMN_ICON +
+                MovieContract.MovieEntry.COLUMN_ICON +
                 " INTEGER NOT NULL," +
-                MoviesContract.MovieEntry.COLUMN_ORIG_TITLE +
+                MovieContract.MovieEntry.COLUMN_ORIG_TITLE +
                 " TEXT NOT NULL," +
-                MoviesContract.MovieEntry.COLUMN_OVERVIEW +
+                MovieContract.MovieEntry.COLUMN_OVERVIEW +
                 " TEXT NOT NULL," +
-                MoviesContract.MovieEntry.COLUMN_RELEASE_DATE +
+                MovieContract.MovieEntry.COLUMN_RELEASE_DATE +
                 " TEXT NOT NULL," +
-                MoviesContract.MovieEntry.COLUMN_POSTER_PATH +
+                MovieContract.MovieEntry.COLUMN_POSTER_PATH +
                 " TEXT NOT NULL," +
-                MoviesContract.MovieEntry.COLUMN_POPULARITY +
+                MovieContract.MovieEntry.COLUMN_POPULARITY +
                 " REAL NOT NULL," +
-                MoviesContract.MovieEntry.COLUMN_TITLE +
+                MovieContract.MovieEntry.COLUMN_TITLE +
                 " TEXT NOT NULL," +
-                MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE +
+                MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE +
                 " REAL NOT NULL," +
-                MoviesContract.MovieEntry.COLUMN_VOTE_COUNT +
+                MovieContract.MovieEntry.COLUMN_VOTE_COUNT +
                 " INTEGER NOT NULL," +
 
                 // ensure new movie information results in an update
-                " UNIQUE (" + MoviesContract.MovieEntry.COLUMN_TMDB_ID +
+                " UNIQUE (" + MovieContract.MovieEntry.COLUMN_TMDB_ID +
                 ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_REVIEW_TABLE = "CREATE TABLE " +
-                MoviesContract.ReviewEntry.TABLE_REVIEWS + "(" +
-                MoviesContract.ReviewEntry._ID +
+                MovieContract.ReviewEntry.TABLE_REVIEWS + "(" +
+                MovieContract.ReviewEntry._ID +
                 " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                MoviesContract.ReviewEntry.COLUMN_MOVIE_ID +
+                MovieContract.ReviewEntry.COLUMN_MOVIE_ID +
                 " INTEGER NOT NULL," +
-                MoviesContract.ReviewEntry.COLUMN_AUTHOR +
+                MovieContract.ReviewEntry.COLUMN_AUTHOR +
                 " TEXT NOT NULL," +
-                MoviesContract.ReviewEntry.COLUMN_CONTENT +
+                MovieContract.ReviewEntry.COLUMN_CONTENT +
                 " TEXT NOT NULL," +
-                MoviesContract.ReviewEntry.COLUMN_URL +
+                MovieContract.ReviewEntry.COLUMN_URL +
                 " TEXT NOT NULL," +
-                MoviesContract.ReviewEntry.COLUMN_LAST_RESULTS_PAGE +
+                MovieContract.ReviewEntry.COLUMN_LAST_RESULTS_PAGE +
                 " INTEGER NOT NULL," +
-                MoviesContract.ReviewEntry.COLUMN_LAST_RESULTS_POSITION +
+                MovieContract.ReviewEntry.COLUMN_LAST_RESULTS_POSITION +
                 " INTEGER NOT NULL," +
 
                 // link movie_id column as foreign key to the movie table
-                " FOREIGN KEY (" + MoviesContract.ReviewEntry.COLUMN_MOVIE_ID +
-                ") REFERENCES " + MoviesContract.MovieEntry.TABLE_MOVIES +
-                " (" + MoviesContract.MovieEntry.COLUMN_TMDB_ID + "))";
+                " FOREIGN KEY (" + MovieContract.ReviewEntry.COLUMN_MOVIE_ID +
+                ") REFERENCES " + MovieContract.MovieEntry.TABLE_MOVIES +
+                " (" + MovieContract.MovieEntry.COLUMN_TMDB_ID + "))";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_REVIEW_TABLE);
@@ -76,12 +76,12 @@ public class MoviesDBHelper extends SQLiteOpenHelper {
                 i1 + ". OLD DATA WILL BE DESTROYED");
 
         // Drop the table
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MoviesContract.MovieEntry.TABLE_MOVIES);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MoviesContract.ReviewEntry.TABLE_REVIEWS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieEntry.TABLE_MOVIES);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.ReviewEntry.TABLE_REVIEWS);
         sqLiteDatabase.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
-                MoviesContract.MovieEntry.TABLE_MOVIES + "'");
+                MovieContract.MovieEntry.TABLE_MOVIES + "'");
         sqLiteDatabase.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
-                MoviesContract.ReviewEntry.TABLE_REVIEWS + "'");
+                MovieContract.ReviewEntry.TABLE_REVIEWS + "'");
 
         // re-create database
         onCreate(sqLiteDatabase);

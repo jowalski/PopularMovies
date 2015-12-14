@@ -17,19 +17,19 @@ public class TestProvider extends AndroidTestCase {
 
     private void deleteAllRecordsFromProvider() {
         mContext.getContentResolver().delete(
-                MoviesContract.MovieEntry.CONTENT_URI,
+                MovieContract.MovieEntry.CONTENT_URI,
                 null,
                 null
         );
 
         mContext.getContentResolver().delete(
-                MoviesContract.ReviewEntry.CONTENT_URI,
+                MovieContract.ReviewEntry.CONTENT_URI,
                 null,
                 null
         );
 
         Cursor cursor = mContext.getContentResolver().query(
-                MoviesContract.MovieEntry.CONTENT_URI,
+                MovieContract.MovieEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -45,7 +45,7 @@ public class TestProvider extends AndroidTestCase {
         }
 
         cursor = mContext.getContentResolver().query(
-                MoviesContract.ReviewEntry.CONTENT_URI,
+                MovieContract.ReviewEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -76,7 +76,7 @@ public class TestProvider extends AndroidTestCase {
         PackageManager pm = mContext.getPackageManager();
 
         ComponentName componentName = new ComponentName(mContext.getPackageName(),
-                MoviesProvider.class.getName());
+                MovieProvider.class.getName());
         try {
             // Fetch the provider info using the component name from the PackageManager
             // This throws an exception if the provider isn't registered.
@@ -84,8 +84,8 @@ public class TestProvider extends AndroidTestCase {
 
             // Make sure that the registered authority matches the authority from the Contract.
             assertEquals("Error: MovieProvider registered with authority: " + providerInfo.authority +
-                            " instead of authority: " + MoviesContract.CONTENT_AUTHORITY,
-                    providerInfo.authority, MoviesContract.CONTENT_AUTHORITY);
+                            " instead of authority: " + MovieContract.CONTENT_AUTHORITY,
+                    providerInfo.authority, MovieContract.CONTENT_AUTHORITY);
         } catch (PackageManager.NameNotFoundException e) {
             // I guess the provider isn't registered correctly.
             assertTrue("Error: MovieProvider not registered at " + mContext.getPackageName(),
@@ -95,19 +95,19 @@ public class TestProvider extends AndroidTestCase {
 
     public void testBasicReviewQuery() {
         // insert our test records into the database
-        MoviesDBHelper dbHelper = new MoviesDBHelper(mContext);
+        MovieDBHelper dbHelper = new MovieDBHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues reviewValues = TestUtilities.createReviewValues();
 
-        long reviewRowId = db.insert(MoviesContract.ReviewEntry.TABLE_REVIEWS,
+        long reviewRowId = db.insert(MovieContract.ReviewEntry.TABLE_REVIEWS,
                 null, reviewValues);
         assertTrue("Unable to Insert Review Entry into the Database", reviewRowId != -1);
         db.close();
 
         // Test the basic content provider query
         Cursor reviewCursor = mContext.getContentResolver().query(
-                MoviesContract.ReviewEntry.CONTENT_URI,
+                MovieContract.ReviewEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -120,15 +120,15 @@ public class TestProvider extends AndroidTestCase {
 
     public void testBasicMovieQuery() {
         // insert our test records into the database
-        MoviesDBHelper dbHelper = new MoviesDBHelper(mContext);
+        MovieDBHelper dbHelper = new MovieDBHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues testValues = TestUtilities.createMovieValues();
-        db.insert(MoviesContract.MovieEntry.TABLE_MOVIES, null, testValues);
+        db.insert(MovieContract.MovieEntry.TABLE_MOVIES, null, testValues);
 
         // Test the basic content provider query
         Cursor movieCursor = mContext.getContentResolver().query(
-                MoviesContract.MovieEntry.CONTENT_URI,
+                MovieContract.MovieEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -144,7 +144,7 @@ public class TestProvider extends AndroidTestCase {
         ContentValues values = TestUtilities.createMovieValues();
 
         Uri movieUri = mContext.getContentResolver()
-                .insert(MoviesContract.MovieEntry.CONTENT_URI, values);
+                .insert(MovieContract.MovieEntry.CONTENT_URI, values);
         long movieRowId = ContentUris.parseId(movieUri);
 
         // Verify we got a row back.
@@ -152,17 +152,17 @@ public class TestProvider extends AndroidTestCase {
         Log.d(LOG_TAG, "New row id: " + movieRowId);
 
         ContentValues updatedValues = new ContentValues(values);
-        updatedValues.put(MoviesContract.MovieEntry.COLUMN_TMDB_ID, movieRowId);
-        updatedValues.put(MoviesContract.MovieEntry.COLUMN_TITLE, "Breathless");
-        updatedValues.put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, "1961-02-07");
+        updatedValues.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, movieRowId);
+        updatedValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Breathless");
+        updatedValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, "1961-02-07");
 
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(MoviesContract.MovieEntry.CONTENT_URI, true, tco);
+        mContext.getContentResolver().registerContentObserver(MovieContract.MovieEntry.CONTENT_URI, true, tco);
 
         int count = mContext.getContentResolver().update(
-                MoviesContract.MovieEntry.CONTENT_URI,
+                MovieContract.MovieEntry.CONTENT_URI,
                 updatedValues,
-                MoviesContract.MovieEntry.COLUMN_TMDB_ID + "= ?",
+                MovieContract.MovieEntry.COLUMN_TMDB_ID + "= ?",
                 new String[]{Long.toString(movieRowId)});
         assertEquals(count, 1);
 
@@ -172,9 +172,9 @@ public class TestProvider extends AndroidTestCase {
         mContext.getContentResolver().unregisterContentObserver(tco);
 
         Cursor cursor = mContext.getContentResolver().query(
-                MoviesContract.MovieEntry.CONTENT_URI,
+                MovieContract.MovieEntry.CONTENT_URI,
                 null,
-                MoviesContract.MovieEntry.COLUMN_TMDB_ID + " = " + movieRowId,
+                MovieContract.MovieEntry.COLUMN_TMDB_ID + " = " + movieRowId,
                 null,
                 null
         );
@@ -193,8 +193,8 @@ public class TestProvider extends AndroidTestCase {
 
         // Register a content observer for our insert.
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(MoviesContract.MovieEntry.CONTENT_URI, true, tco);
-        Uri movieUri = mContext.getContentResolver().insert(MoviesContract.MovieEntry.CONTENT_URI, movieValues);
+        mContext.getContentResolver().registerContentObserver(MovieContract.MovieEntry.CONTENT_URI, true, tco);
+        Uri movieUri = mContext.getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, movieValues);
 
         tco.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(tco);
@@ -204,7 +204,7 @@ public class TestProvider extends AndroidTestCase {
         assertTrue(movieRowId != -1);
 
         Cursor cursor = mContext.getContentResolver().query(
-                MoviesContract.MovieEntry.CONTENT_URI,
+                MovieContract.MovieEntry.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
                 null,
                 null,
@@ -217,17 +217,17 @@ public class TestProvider extends AndroidTestCase {
         ContentValues reviewValues = TestUtilities.createReviewValues();
         tco = TestUtilities.getTestContentObserver();
 
-        mContext.getContentResolver().registerContentObserver(MoviesContract.ReviewEntry.CONTENT_URI, true, tco);
+        mContext.getContentResolver().registerContentObserver(MovieContract.ReviewEntry.CONTENT_URI, true, tco);
 
         Uri reviewInsertUri = mContext.getContentResolver()
-                .insert(MoviesContract.ReviewEntry.CONTENT_URI, reviewValues);
+                .insert(MovieContract.ReviewEntry.CONTENT_URI, reviewValues);
         assertTrue(reviewInsertUri != null);
 
         tco.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(tco);
 
         Cursor reviewCursor = mContext.getContentResolver().query(
-                MoviesContract.ReviewEntry.CONTENT_URI,  // Table to Query
+                MovieContract.ReviewEntry.CONTENT_URI,  // Table to Query
                 null, // leaving "columns" null just returns all the columns.
                 null,
                 null,
@@ -242,7 +242,7 @@ public class TestProvider extends AndroidTestCase {
         reviewValues.putAll(movieValues);
 
         reviewCursor = mContext.getContentResolver().query(
-                MoviesContract.MovieEntry.buildMovieWReviewsUri(movieRowId),
+                MovieContract.MovieEntry.buildMovieWReviewsUri(movieRowId),
                 null,
                 null,
                 null,
@@ -256,10 +256,10 @@ public class TestProvider extends AndroidTestCase {
         testInsertReadProvider();
 
         TestUtilities.TestContentObserver movieObserver = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(MoviesContract.MovieEntry.CONTENT_URI, true, movieObserver);
+        mContext.getContentResolver().registerContentObserver(MovieContract.MovieEntry.CONTENT_URI, true, movieObserver);
 
         TestUtilities.TestContentObserver reviewObserver = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(MoviesContract.ReviewEntry.CONTENT_URI, true, reviewObserver);
+        mContext.getContentResolver().registerContentObserver(MovieContract.ReviewEntry.CONTENT_URI, true, reviewObserver);
 
         deleteAllRecordsFromProvider();
 
@@ -275,24 +275,24 @@ public class TestProvider extends AndroidTestCase {
         ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_RECORDS_TO_INSERT];
         for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++) {
             ContentValues movieValues = new ContentValues();
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_TMDB_ID, 8382 + i);
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_ICON, 1324 - i);
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_ORIG_TITLE,
+            movieValues.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, 8382 + i);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_ICON, 1324 - i);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE,
                     "Vivre sa vie " + Integer.toString(i));
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_OVERVIEW,
+            movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW,
                     "In director Jean-Luc Godard's landmark drama, Nana (Anna Karina), " +
                             "a young Parisian woman who works in a record shop, finds herself " +
                             "disillusioned by poverty and a crumbling marriage. Hoping to become " +
                             "an actress and break into films, Nana is once again disappointed " +
                             "when nothing comes of her dreams...");
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, "1962-09-20");
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH,
+            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, "1962-09-20");
+            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH,
                     "http://static.rogerebert.com/uploads/review/primary_image/reviews/great-movie-vivre-sa-vie--my-life-to-live-1963/hero_EB20010401REVIEWS08104010301AR.jpg");
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_POPULARITY, 5.2);
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_TITLE,
+            movieValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, 5.2);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE,
                     "Vivre sa vie " + Integer.toString(i));
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, 7.2);
-            movieValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, 38254 - i);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, 7.2);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, 38254 - i);
 
             returnContentValues[i] = movieValues;
         }
@@ -301,13 +301,13 @@ public class TestProvider extends AndroidTestCase {
 
     public void testBulkInsert() {
 //        ContentValues testValues = TestUtilities.createMovieValues();
-//        Uri movieUri = mContext.getContentResolver().insert(MoviesContract.MovieEntry.CONTENT_URI, testValues);
+//        Uri movieUri = mContext.getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, testValues);
 //        long movieRowId = ContentUris.parseId(movieUri);
 //
 //        assertTrue(movieRowId != -1);
 //
 //        Cursor cursor = mContext.getContentResolver().query(
-//                MoviesContract.MovieEntry.CONTENT_URI,
+//                MovieContract.MovieEntry.CONTENT_URI,
 //                null,
 //                null,
 //                null,
@@ -320,9 +320,9 @@ public class TestProvider extends AndroidTestCase {
         ContentValues[] bulkInsertContentValues = createBulkInsertMovieValues();
 
         TestUtilities.TestContentObserver movieObserver = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(MoviesContract.MovieEntry.CONTENT_URI, true, movieObserver);
+        mContext.getContentResolver().registerContentObserver(MovieContract.MovieEntry.CONTENT_URI, true, movieObserver);
 
-        int insertCount = mContext.getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI, bulkInsertContentValues);
+        int insertCount = mContext.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, bulkInsertContentValues);
 
         movieObserver.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(movieObserver);
@@ -330,11 +330,11 @@ public class TestProvider extends AndroidTestCase {
         assertEquals(insertCount, BULK_INSERT_RECORDS_TO_INSERT);
 
         Cursor cursor = mContext.getContentResolver().query(
-                MoviesContract.MovieEntry.CONTENT_URI,
+                MovieContract.MovieEntry.CONTENT_URI,
                 null,
                 null,
                 null,
-                MoviesContract.MovieEntry.COLUMN_TMDB_ID // sort order, by TMDB_ID descending
+                MovieContract.MovieEntry.COLUMN_TMDB_ID // sort order, by TMDB_ID descending
         );
 
         if (cursor != null) {

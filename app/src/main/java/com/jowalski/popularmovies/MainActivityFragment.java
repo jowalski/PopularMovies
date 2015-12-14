@@ -27,6 +27,9 @@ public class MainActivityFragment extends Fragment implements FetchMoviesListene
     private static final long FETCH_MOVIES_MAX_WAIT = 3;
     public static final String DET_ACT_MOVIE_OBJ_INTENT_KEY = "movie_obj";
 
+    public static final int SORT_ORDER_BY_POPULARITY = 0;
+    public static final int SORT_ORDER_BY_RATING = 1;
+
 
     private MovieAdapter movieAdapter;
 

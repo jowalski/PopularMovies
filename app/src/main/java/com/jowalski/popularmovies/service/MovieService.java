@@ -12,7 +12,7 @@ import com.jowalski.popularmovies.BuildConfig;
 import com.jowalski.popularmovies.FetchMoviesTask;
 import com.jowalski.popularmovies.MainActivityFragment;
 import com.jowalski.popularmovies.Movie;
-import com.jowalski.popularmovies.data.MoviesContract;
+import com.jowalski.popularmovies.data.MovieContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -182,7 +182,7 @@ public class MovieService extends IntentService {
             if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                this.getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI, cvArray);
+                this.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
             }
 
             Log.d(LOG_TAG, "FetchMoviesTask Complete. ");
@@ -213,15 +213,15 @@ public class MovieService extends IntentService {
 
     private ContentValues newCVFromMovie(Movie movie) {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_TMDB_ID, movie.movieId);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_ORIG_TITLE, movie.origTitle);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_OVERVIEW, movie.overview);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, movie.releaseDate);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, movie.posterPath);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_POPULARITY, movie.popularity);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_TITLE, movie.title);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.vote_average);
-        movieValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, movie.vote_count);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, movie.movieId);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE, movie.origTitle);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.overview);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.releaseDate);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.posterPath);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, movie.popularity);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.title);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.vote_average);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, movie.vote_count);
 
         return movieValues;
     }
