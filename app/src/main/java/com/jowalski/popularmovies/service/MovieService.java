@@ -1,7 +1,9 @@
 package com.jowalski.popularmovies.service;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -222,5 +224,16 @@ public class MovieService extends IntentService {
         movieValues.put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, movie.vote_count);
 
         return movieValues;
+    }
+
+    public static class AlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Intent sendIntent = new Intent(context, MovieService.class);
+            sendIntent.putExtra(MovieService.SORT_ORDER_EXTRA, intent.getStringExtra(MovieService.SORT_ORDER_EXTRA));
+            context.startService(sendIntent);
+
+        }
     }
 }

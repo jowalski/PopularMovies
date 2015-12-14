@@ -37,5 +37,9 @@
             android:authorities="com.jowalski.popularmovies"
             android:exported="false"
             android:syncable="true" />
+        <service android:name=".service.MovieService" />
+        <receiver
+            android:name=".service.MovieService$AlarmReceiver"
+            android:enabled="true" />
     </application>
 </manifest>
