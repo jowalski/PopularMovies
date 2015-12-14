@@ -5,13 +5,11 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-/**
- * Created by jowalski on 12/10/15.
- */
 public class MoviesContract {
 
     public static final String CONTENT_AUTHORITY = "com.jowalski.popularmovies";
 
+    @SuppressWarnings("WeakerAccess")
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final class MovieEntry implements BaseColumns {
@@ -79,11 +77,13 @@ public class MoviesContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        @SuppressWarnings("unused")
         public static Uri buildReviewWithMovieId(long movieId) {
             return CONTENT_URI.buildUpon().appendPath(MoviesProvider.MOVIE_ID_URI_ABR)
                     .appendPath(Long.toString(movieId)).build();
         }
 
+        @SuppressWarnings("unused")
         public static long getMovieIdFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(2));
         }

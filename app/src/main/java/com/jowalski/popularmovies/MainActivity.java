@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will

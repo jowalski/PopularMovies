@@ -3,9 +3,6 @@ package com.jowalski.popularmovies;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-/**
- * Created by jowalski on 11/26/15.
- */
 public class MovieDetailActivity extends AppCompatActivity {
 
     @Override

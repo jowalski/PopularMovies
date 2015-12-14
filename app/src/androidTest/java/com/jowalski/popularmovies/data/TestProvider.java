@@ -11,14 +11,11 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-/**
- * Created by jowalski on 12/11/15.
- */
 public class TestProvider extends AndroidTestCase {
 
     private static final String LOG_TAG = TestProvider.class.getSimpleName();
 
-    public void deleteAllRecordsFromProvider() {
+    private void deleteAllRecordsFromProvider() {
         mContext.getContentResolver().delete(
                 MoviesContract.MovieEntry.CONTENT_URI,
                 null,
@@ -39,9 +36,13 @@ public class TestProvider extends AndroidTestCase {
                 null
         );
 
-        assertEquals("Error: Records not deleted from Movie table during delete", 0,
-                cursor.getCount());
-        cursor.close();
+        if (cursor != null) {
+            assertEquals("Error: Records not deleted from Movie table during delete", 0,
+                    cursor.getCount());
+            cursor.close();
+        } else {
+            assertTrue("Error: Cursor is null.", false);
+        }
 
         cursor = mContext.getContentResolver().query(
                 MoviesContract.ReviewEntry.CONTENT_URI,
@@ -51,13 +52,17 @@ public class TestProvider extends AndroidTestCase {
                 null
         );
 
-        assertEquals("Error: Records not deleted from Review table during delete", 0,
-                cursor.getCount());
-        cursor.close();
+        if (cursor != null) {
+            assertEquals("Error: Records not deleted from Review table during delete", 0,
+                    cursor.getCount());
+            cursor.close();
+        } else {
+            assertTrue("Error: Cursor is null.", false);
+        }
 
     }
 
-    public void deleteAllRecords() {
+    private void deleteAllRecords() {
         deleteAllRecordsFromProvider();
     }
 
@@ -93,7 +98,6 @@ public class TestProvider extends AndroidTestCase {
         MoviesDBHelper dbHelper = new MoviesDBHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-//        TestUtilities.insertMovieValues(mContext);
         ContentValues reviewValues = TestUtilities.createReviewValues();
 
         long reviewRowId = db.insert(MoviesContract.ReviewEntry.TABLE_REVIEWS,
@@ -120,7 +124,7 @@ public class TestProvider extends AndroidTestCase {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues testValues = TestUtilities.createMovieValues();
-        long movieRowId = db.insert(MoviesContract.MovieEntry.TABLE_MOVIES, null, testValues);
+        db.insert(MoviesContract.MovieEntry.TABLE_MOVIES, null, testValues);
 
         // Test the basic content provider query
         Cursor movieCursor = mContext.getContentResolver().query(
@@ -177,7 +181,11 @@ public class TestProvider extends AndroidTestCase {
 
         TestUtilities.validateCursor("testUpdateMovie.  Error validating movie entry update.",
                 cursor, updatedValues);
-        cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        } else {
+        assertTrue("Error: Cursor is null.", false);
+        }
     }
 
     public void testInsertReadProvider() {
@@ -263,7 +271,7 @@ public class TestProvider extends AndroidTestCase {
     }
 
     static private final int BULK_INSERT_RECORDS_TO_INSERT = 10;
-    static ContentValues[] createBulkInsertMovieValues() {
+    private static ContentValues[] createBulkInsertMovieValues() {
         ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_RECORDS_TO_INSERT];
         for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++) {
             ContentValues movieValues = new ContentValues();
@@ -329,13 +337,17 @@ public class TestProvider extends AndroidTestCase {
                 MoviesContract.MovieEntry.COLUMN_TMDB_ID // sort order, by TMDB_ID descending
         );
 
-        assertEquals(cursor.getCount(), BULK_INSERT_RECORDS_TO_INSERT);
+        if (cursor != null) {
+            assertEquals(cursor.getCount(), BULK_INSERT_RECORDS_TO_INSERT);
+            cursor.moveToFirst();
 
-        cursor.moveToFirst();
-        for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++, cursor.moveToNext() ) {
-            TestUtilities.validateCurrentRecord("testBulkInsert.  Error validating WeatherEntry " + i,
-                    cursor, bulkInsertContentValues[i]);
+            for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++, cursor.moveToNext() ) {
+                TestUtilities.validateCurrentRecord("testBulkInsert.  Error validating WeatherEntry " + i,
+                        cursor, bulkInsertContentValues[i]);
+            }
+            cursor.close();
+        } else {
+            assertTrue("Error: Cursor is null.", false);
         }
-        cursor.close();
     }
 }

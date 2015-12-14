@@ -4,6 +4,7 @@
 
     <application
         tools:replace="android:name"
-        android:name=".PopularMoviesDebug" />
+        android:name=".PopularMoviesDebug"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning" />
 
 </manifest>

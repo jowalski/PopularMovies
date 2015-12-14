@@ -7,10 +7,10 @@ import com.facebook.stetho.okhttp.StethoInterceptor;
 import com.squareup.okhttp.OkHttpClient;
 
 /**
- * Created by jowalski on 12/13/15.
- */
+ * Application class for debug build, for initializing Stetho debug
+ * platform, for debugging database/content provider and network issues.
+  */
 public class PopularMoviesDebug extends Application {
-    private static final String LOG_TAG = PopularMoviesDebug.class.getSimpleName();
 
     @Override
     public void onCreate() {

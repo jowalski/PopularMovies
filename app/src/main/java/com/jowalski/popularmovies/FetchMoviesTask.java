@@ -22,30 +22,30 @@ import java.net.URL;
  */
 public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrder, Void, Movie[]> {
 
-    private static final String TAG = FetchMoviesTask.class.getSimpleName();
+    private static final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
     private final FetchMoviesListener listener;
 
-    final String THE_MOVIE_DB_BASE_API_URL = "https://api.themoviedb.org/3/";
-    final String DISCOVER_MOVIE_ENDPOINT = "discover/movie";
+    private static final String THE_MOVIE_DB_BASE_API_URL = "https://api.themoviedb.org/3/";
+    private static final String DISCOVER_MOVIE_ENDPOINT = "discover/movie";
 
     // themoviedb api uri fields
-    final String SORT_BY_PARAM = "sort_by";
-    final String SORT_BY_VALUE_POP = "popularity.desc";
-    final String SORT_BY_VALUE_VOTE = "vote_average.desc";
-    final String API_KEY_PARAM = "api_key";
+    private static final String SORT_BY_PARAM = "sort_by";
+    private static final String SORT_BY_VALUE_POP = "popularity.desc";
+    private static final String SORT_BY_VALUE_VOTE = "vote_average.desc";
+    private static final String API_KEY_PARAM = "api_key";
 
     // movie info element fields
-    static final String TMDB_ID = "id";
-    static final String TMDB_ORIG_TITLE = "original_title";
-    static final String TMDB_OVERVIEW = "overview";
-    static final String TMDB_RELEASE_DATE = "release_date";
-    static final String TMDB_POSTER_PATH = "poster_path";
-    static final String TMDB_POPULARITY = "popularity";
-    static final String TMDB_TITLE = "title";
+    private static final String TMDB_ID = "id";
+    private static final String TMDB_ORIG_TITLE = "original_title";
+    private static final String TMDB_OVERVIEW = "overview";
+    private static final String TMDB_RELEASE_DATE = "release_date";
+    private static final String TMDB_POSTER_PATH = "poster_path";
+    private static final String TMDB_POPULARITY = "popularity";
+    private static final String TMDB_TITLE = "title";
     // TODO: 11/24/15 decide whether to use genre_ids
     // final String TMDB_GENRE_IDS = "genre_ids";
-    static final String TMDB_VOTE_AVG = "vote_average";
-    static final String TMDB_VOTE_CNT = "vote_count";
+    private static final String TMDB_VOTE_AVG = "vote_average";
+    private static final String TMDB_VOTE_CNT = "vote_count";
 
     static final int TMDB_VOTE_OUT_OF = 10;
 
@@ -55,12 +55,12 @@ public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrd
     //        new SimpleDateFormat(TMDB_RELEASE_DATE_FMT, Locale.US);
 
     // fields for constructing the posterPath
-    static final String THE_MOVIE_DB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
+    private static final String THE_MOVIE_DB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
 
     // these are all (?) possible image sizes
     // final String POSTER_SIZE_W92 = "w92";
     // final String POSTER_SIZE_W154 = "w154";
-    static final String POSTER_SIZE_W185 = "w185";
+    private static final String POSTER_SIZE_W185 = "w185";
     // final String POSTER_SIZE_W342 = "w342";
     // final String POSTER_SIZE_W500 = "w500";
     // final String POSTER_SIZE_W780 = "w780";
@@ -126,7 +126,7 @@ public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrd
             String moviesJsonStr = buffer.toString();
             moviesArray = getMoviesInfoFromJson(moviesJsonStr);
         } catch (IOException e) {
-            Log.e(TAG, "Could not fetch the movie com.jowalski.popularmovies.data", e);
+            Log.e(LOG_TAG, "Could not fetch the movie com.jowalski.popularmovies.data", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -135,7 +135,7 @@ public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrd
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e(TAG, "Error closing stream", e);
+                    Log.e(LOG_TAG, "Error closing stream", e);
                 }
             }
         }
@@ -164,10 +164,10 @@ public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrd
                 JSONObject movieJson = moviesJSONArray.getJSONObject(i);
                 moviesArray[i] = newMovieFromJson(movieJson);
             }
-            Log.d(TAG, "FetchMoviesTask Complete. ");
+            Log.d(LOG_TAG, "FetchMoviesTask Complete. ");
             return moviesArray;
         } catch (JSONException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
         return null;

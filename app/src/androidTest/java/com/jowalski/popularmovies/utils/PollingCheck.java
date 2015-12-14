@@ -4,9 +4,6 @@ import junit.framework.Assert;
 
 import java.util.concurrent.Callable;
 
-/**
- * Created by jowalski on 12/12/15.
- */
 public abstract class PollingCheck {
     private static final long TIME_SLICE = 50;
     private long mTimeout = 3000;
@@ -15,7 +12,7 @@ public abstract class PollingCheck {
     }
 
     public PollingCheck(long timeout) {
-        mTimeout = timeout;
+        mTimeout = (long) 5000;
     }
 
     protected abstract boolean check();

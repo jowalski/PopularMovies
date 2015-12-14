@@ -3,18 +3,16 @@ package com.jowalski.popularmovies.data;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
-/**
- * Created by jowalski on 12/10/15.
- */
 public class MoviesProvider extends ContentProvider {
     private static final String LOG_TAG = MoviesProvider.class.getSimpleName();
     private MoviesDBHelper mOpenHelper;
@@ -76,9 +74,8 @@ public class MoviesProvider extends ContentProvider {
         return true;
     }
 
-    @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
         switch(sUriMatcher.match(uri)) {
@@ -171,9 +168,8 @@ public class MoviesProvider extends ContentProvider {
         }
     }
 
-    @Nullable
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
@@ -190,9 +186,8 @@ public class MoviesProvider extends ContentProvider {
         }
     }
 
-    @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues contentValues) {
+    public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         Uri returnUri;
         switch (sUriMatcher.match(uri)) {
@@ -220,12 +215,12 @@ public class MoviesProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        notifyResolverChange(getContext(), uri);
         return returnUri;
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int numDeleted;
@@ -263,13 +258,13 @@ public class MoviesProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         if (numDeleted > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            notifyResolverChange(getContext(), uri);
         }
         return numDeleted;
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
@@ -310,7 +305,7 @@ public class MoviesProvider extends ContentProvider {
                 if (numInserted > 0){
                     // if there was successful insertion, notify the content resolver that there
                     // was a change
-                    getContext().getContentResolver().notifyChange(uri, null);
+                    notifyResolverChange(getContext(), uri);
                 }
                 return numInserted;
             case REVIEW:
@@ -350,7 +345,7 @@ public class MoviesProvider extends ContentProvider {
                 if (numInserted > 0){
                     // if there was successful insertion, notify the content resolver that there
                     // was a change
-                    getContext().getContentResolver().notifyChange(uri, null);
+                    notifyResolverChange(getContext(), uri);
                 }
                 return numInserted;
             default:
@@ -359,9 +354,9 @@ public class MoviesProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
+    public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        int numUpdated = 0;
+        int numUpdated;
 
         if (contentValues == null){
             throw new IllegalArgumentException("Cannot have null content values");
@@ -401,9 +396,15 @@ public class MoviesProvider extends ContentProvider {
             }
         }
         if (numUpdated > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            notifyResolverChange(getContext(), uri);
         }
 
         return numUpdated;
+    }
+
+    static private void notifyResolverChange(Context context, Uri uri) {
+        if (context != null) {
+            context.getContentResolver().notifyChange(uri, null);
+        } else throw new NullPointerException("No context.");
     }
 }

@@ -1,11 +1,19 @@
 <component name="ProjectDictionaryState">
   <dictionary name="jowalski">
     <words>
+      <w>dexed</w>
       <w>gridview</w>
       <w>jowalski</w>
+      <w>okhttp</w>
       <w>popularmovies</w>
+      <w>recyclerview</w>
+      <w>sqlite</w>
+      <w>squareup</w>
+      <w>stetho</w>
+      <w>textview</w>
       <w>themoviedb</w>
       <w>tmdb</w>
+      <w>urlconnection</w>
     </words>
   </dictionary>
 </component>

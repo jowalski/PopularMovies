@@ -1,10 +1,8 @@
 package com.jowalski.popularmovies.data;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -16,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by jowalski on 12/11/15.
+ * Utilities for tests.
  */
 public class TestUtilities extends AndroidTestCase {
 
@@ -57,21 +55,6 @@ public class TestUtilities extends AndroidTestCase {
         reviewValues.put(MoviesContract.ReviewEntry.COLUMN_LAST_RESULTS_POSITION, 1);
 
         return reviewValues;
-    }
-
-    static long insertMovieValues(Context context) {
-        // insert our test records into the database
-        MoviesDBHelper dbHelper = new MoviesDBHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues testValues = TestUtilities.createMovieValues();
-
-        long rowId;
-        rowId = db.insert(MoviesContract.MovieEntry.TABLE_MOVIES, null, testValues);
-
-        // Verify we got a row back.
-        assertTrue("Error: Failure to insert test Movie values", rowId != -1);
-
-        return rowId;
     }
 
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {

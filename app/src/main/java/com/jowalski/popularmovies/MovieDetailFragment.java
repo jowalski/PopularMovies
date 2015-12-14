@@ -22,7 +22,7 @@ public class MovieDetailFragment extends Fragment {
 
     private static final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
 
-    static final SimpleDateFormat TMDB_SDF = new SimpleDateFormat(FetchMoviesTask.TMDB_DATE_FORMAT, Locale.US);
+    private static final SimpleDateFormat TMDB_SDF = new SimpleDateFormat(FetchMoviesTask.TMDB_DATE_FORMAT, Locale.US);
 
     public MovieDetailFragment() {
     }
@@ -70,7 +70,7 @@ public class MovieDetailFragment extends Fragment {
         return rootView;
     }
 
-    String parseAndFormatReleaseDate(String relDateStr) {
+    private String parseAndFormatReleaseDate(String relDateStr) {
         Date relDate = null;
 
         // first parse the date string from theMovieDB
