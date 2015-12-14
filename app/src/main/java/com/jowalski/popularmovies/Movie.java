@@ -9,15 +9,15 @@ import android.os.Parcelable;
  */
 public class Movie implements Parcelable {
 
-    int movieId;
-    String origTitle;
-    String overview;
-    String releaseDate;
-    String posterPath;
-    double popularity;
-    String title;
-    double vote_average;
-    int vote_count;
+    public int movieId;
+    public String origTitle;
+    public String overview;
+    public String releaseDate;
+    public String posterPath;
+    public double popularity;
+    public String title;
+    public double vote_average;
+    public int vote_count;
 
     public Movie() {
     }
