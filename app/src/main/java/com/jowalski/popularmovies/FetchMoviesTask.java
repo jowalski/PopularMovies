@@ -126,7 +126,7 @@ public class FetchMoviesTask extends AsyncTask<MainActivityFragment.MovieSortOrd
             String moviesJsonStr = buffer.toString();
             moviesArray = getMoviesInfoFromJson(moviesJsonStr);
         } catch (IOException e) {
-            Log.e(TAG, "Could not fetch the movie data", e);
+            Log.e(TAG, "Could not fetch the movie com.jowalski.popularmovies.data", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

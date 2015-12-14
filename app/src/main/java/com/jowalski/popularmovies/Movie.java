@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * A Parcelable class containing already parsed Json data
+ * A Parcelable class containing already parsed Json com.jowalski.popularmovies.data
  * for a movie from theMovieDB.org website.
  */
 public class Movie implements Parcelable {
