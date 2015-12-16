@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.jowalski.popularmovies.BuildConfig;
-import com.jowalski.popularmovies.FetchMoviesTask;
 import com.jowalski.popularmovies.MainActivityFragment;
 import com.jowalski.popularmovies.Movie;
 import com.jowalski.popularmovies.data.MovieContract;
@@ -31,9 +30,10 @@ import java.util.Vector;
  */
 public class MovieService extends IntentService {
     public static final String SORT_ORDER_EXTRA = "sort_order";
+    public static final String NOTIFY_RESOLVER_EXTRA = "notify_resolver";
 
-    private static final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
-    // private final FetchMoviesListener listener;
+
+    private static final String LOG_TAG = MovieService.class.getSimpleName();
 
     private static final String THE_MOVIE_DB_BASE_API_URL = "https://api.themoviedb.org/3/";
     private static final String DISCOVER_MOVIE_ENDPOINT = "discover/movie";
@@ -52,17 +52,8 @@ public class MovieService extends IntentService {
     private static final String TMDB_POSTER_PATH = "poster_path";
     private static final String TMDB_POPULARITY = "popularity";
     private static final String TMDB_TITLE = "title";
-    // TODO: 11/24/15 decide whether to use genre_ids
-    // final String TMDB_GENRE_IDS = "genre_ids";
     private static final String TMDB_VOTE_AVG = "vote_average";
     private static final String TMDB_VOTE_CNT = "vote_count";
-
-    static final int TMDB_VOTE_OUT_OF = 10;
-
-    // static final String TMDB_RELEASE_DATE_FMT = "MM/dd/yyyy";
-    static final String TMDB_DATE_FORMAT = "yyyy-MM-dd";
-    // static final SimpleDateFormat dateFormat =
-    //        new SimpleDateFormat(TMDB_RELEASE_DATE_FMT, Locale.US);
 
     // fields for constructing the posterPath
     private static final String THE_MOVIE_DB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
@@ -77,18 +68,18 @@ public class MovieService extends IntentService {
     // final String POSTER_SIZE_ORIG = "original";
 
     public MovieService() {
-        super("PopularMovies");
+        super("Movie");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        MainActivityFragment.MovieSortOrder sortOrder =
-                intent.getParcelableExtra(SORT_ORDER_EXTRA);
+        int sortOrder = intent.getIntExtra(SORT_ORDER_EXTRA,
+                MainActivityFragment.SORT_ORDER_BY_POPULARITY);
+
+        boolean notifyResolver = intent.getBooleanExtra(NOTIFY_RESOLVER_EXTRA, true);
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-
-        Movie[] moviesArray = null;
 
         try {
             String base_url = THE_MOVIE_DB_BASE_API_URL +
@@ -96,9 +87,11 @@ public class MovieService extends IntentService {
 
             String sort_by_value = SORT_BY_VALUE_POP;
             switch (sortOrder) {
-                case BY_POPULARITY:  sort_by_value = SORT_BY_VALUE_POP;
+                case MainActivityFragment.SORT_ORDER_BY_POPULARITY:
+                    sort_by_value = SORT_BY_VALUE_POP;
                     break;
-                case BY_RATING:  sort_by_value = SORT_BY_VALUE_VOTE;
+                case MainActivityFragment.SORT_ORDER_BY_RATING:
+                    sort_by_value = SORT_BY_VALUE_VOTE;
                     break;
             }
 
@@ -135,7 +128,10 @@ public class MovieService extends IntentService {
             }
 
             String moviesJsonStr = buffer.toString();
-            moviesArray = getMoviesInfoFromJson(moviesJsonStr);
+            getMoviesInfoFromJson(moviesJsonStr);
+            if (notifyResolver) {
+                getContentResolver().notifyChange(MovieContract.MovieEntry.CONTENT_URI, null);
+            }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Could not fetch the movie com.jowalski.popularmovies.data", e);
         } finally {
@@ -150,10 +146,9 @@ public class MovieService extends IntentService {
                 }
             }
         }
-        return;
     }
 
-    private Movie[] getMoviesInfoFromJson(String moviesJsonStr)  {
+    private void getMoviesInfoFromJson(String moviesJsonStr)  {
         // each Json result consists of these top-level elements,
         // the 'results' field contains the movie info elements
         final String TMDB_RESULTS = "results";
@@ -184,14 +179,10 @@ public class MovieService extends IntentService {
                 cVVector.toArray(cvArray);
                 this.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
             }
-
-            Log.d(LOG_TAG, "FetchMoviesTask Complete. ");
-            return moviesArray;
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
-        return null;
     }
 
     private Movie newMovieFromJson(JSONObject movieJson) throws JSONException {
@@ -213,7 +204,7 @@ public class MovieService extends IntentService {
 
     private ContentValues newCVFromMovie(Movie movie) {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, movie.movieId);
+        movieValues.put(MovieContract.MovieEntry._ID, movie.movieId);
         movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE, movie.origTitle);
         movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.overview);
         movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.releaseDate);

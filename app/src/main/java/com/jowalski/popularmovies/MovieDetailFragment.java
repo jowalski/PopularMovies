@@ -22,7 +22,8 @@ public class MovieDetailFragment extends Fragment {
 
     private static final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
 
-    private static final SimpleDateFormat TMDB_SDF = new SimpleDateFormat(FetchMoviesTask.TMDB_DATE_FORMAT, Locale.US);
+    private static final SimpleDateFormat TMDB_SDF = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    static final int TMDB_VOTE_OUT_OF = 10;
 
     public MovieDetailFragment() {
     }
@@ -56,7 +57,7 @@ public class MovieDetailFragment extends Fragment {
 
             ((TextView) rootView.findViewById(R.id.rating_out_of_textview))
                     .setText(String.format(getContext().getString(R.string.format_rating_out_of),
-                            FetchMoviesTask.TMDB_VOTE_OUT_OF));
+                            TMDB_VOTE_OUT_OF));
 
             ((TextView) rootView.findViewById(R.id.plot_textview))
                     .setText(movie.overview);

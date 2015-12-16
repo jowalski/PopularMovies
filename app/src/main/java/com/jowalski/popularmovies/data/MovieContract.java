@@ -17,7 +17,7 @@ public class MovieContract {
         public static final String TABLE_MOVIES = "movies";
 
         // columns
-        public static final String COLUMN_TMDB_ID = "tmdb_id";
+        public static final String _ID = "_id";
         public static final String COLUMN_ICON = "icon";
         public static final String COLUMN_ORIG_TITLE = "orig_title";
         public static final String COLUMN_OVERVIEW = "overview";
@@ -67,10 +67,12 @@ public class MovieContract {
                 .appendPath(TABLE_REVIEWS).build();
         // create cursor of base type directory for multiple entries
         public static final String CONTENT_DIR_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + TABLE_REVIEWS;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY +
+                        "/" + TABLE_REVIEWS;
         // create cursor of base type item for single entry
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + TABLE_REVIEWS;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY +
+                        "/" + TABLE_REVIEWS;
 
         // for building URIs on insertion
         public static Uri buildReviewUri(long id){

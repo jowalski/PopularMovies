@@ -39,7 +39,7 @@ public class MovieProvider extends ContentProvider {
                 MovieContract.MovieEntry.TABLE_MOVIES + " INNER JOIN " +
                         MovieContract.ReviewEntry.TABLE_REVIEWS +
                         " ON " + MovieContract.MovieEntry.TABLE_MOVIES +
-                        "." + MovieContract.MovieEntry.COLUMN_TMDB_ID +
+                        "." + MovieContract.MovieEntry._ID +
                         " = " + MovieContract.ReviewEntry.TABLE_REVIEWS +
                         "." + MovieContract.ReviewEntry.COLUMN_MOVIE_ID);
     }
@@ -96,7 +96,7 @@ public class MovieProvider extends ContentProvider {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_MOVIES,
                         projection,
-                        MovieContract.MovieEntry.COLUMN_TMDB_ID + " = ?",
+                        MovieContract.MovieEntry._ID + " = ?",
                         new String[] {String.valueOf(ContentUris.parseId(uri))},
                         null,
                         null,
@@ -118,7 +118,7 @@ public class MovieProvider extends ContentProvider {
                 retCursor = sMoviewReviewsQueryBuilder.query(
                         mOpenHelper.getReadableDatabase(),
                         projection,
-                        MovieContract.MovieEntry.COLUMN_TMDB_ID + " = ?",
+                        MovieContract.MovieEntry._ID + " = ?",
                         new String[] {String.valueOf(ContentUris.parseId(uri))},
                         null,
                         null,
@@ -234,7 +234,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             case MOVIE_WITH_ID:
                 numDeleted = db.delete(MovieContract.MovieEntry.TABLE_MOVIES,
-                        MovieContract.MovieEntry.COLUMN_TMDB_ID + " = ?",
+                        MovieContract.MovieEntry._ID + " = ?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 // reset _ID
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
@@ -267,90 +267,57 @@ public class MovieProvider extends ContentProvider {
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
+        String tableName;
+        String labelColumn;
         switch (match) {
             case MOVIE:
-                // allows for multiple transactions
-                db.beginTransaction();
-
-                // keep track of successful inserts
-                int numInserted = 0;
-                try {
-                    for (ContentValues value : values) {
-                        if (value == null){
-                            throw new IllegalArgumentException("Cannot have null content values");
-                        }
-                        long _id = -1;
-                        try {
-                            _id = db.insertOrThrow(MovieContract.MovieEntry.TABLE_MOVIES,
-                                    null, value);
-                        } catch(SQLiteConstraintException e) {
-                            Log.w(LOG_TAG, "Attempting to insert " +
-                                    value.getAsString(
-                                            MovieContract.MovieEntry.COLUMN_TITLE)
-                                    + " but value is already in database.");
-                        }
-                        if (_id != -1){
-                            numInserted++;
-                        }
-                    }
-                    if (numInserted > 0){
-                        // If no errors, declare a successful transaction.
-                        // database will not populate if this is not called
-                        db.setTransactionSuccessful();
-                    }
-                } finally {
-                    // all transactions occur at once
-                    db.endTransaction();
-                }
-                if (numInserted > 0){
-                    // if there was successful insertion, notify the content resolver that there
-                    // was a change
-                    notifyResolverChange(getContext(), uri);
-                }
-                return numInserted;
+                tableName = MovieContract.MovieEntry.TABLE_MOVIES;
+                labelColumn = MovieContract.MovieEntry.COLUMN_TITLE;
+                break;
             case REVIEW:
-                // allows for multiple transactions
-                db.beginTransaction();
-
-                // keep track of successful inserts
-                numInserted = 0;
-                try {
-                    for (ContentValues value : values) {
-                        if (value == null){
-                            throw new IllegalArgumentException("Cannot have null content values");
-                        }
-                        long _id = -1;
-                        try {
-                            _id = db.insertOrThrow(MovieContract.ReviewEntry.TABLE_REVIEWS,
-                                    null, value);
-                        } catch(SQLiteConstraintException e) {
-                            Log.w(LOG_TAG, "Attempting to insert " +
-                                    value.getAsString(
-                                            MovieContract.ReviewEntry.COLUMN_AUTHOR)
-                                    + " but value is already in database.");
-                        }
-                        if (_id != -1){
-                            numInserted++;
-                        }
-                    }
-                    if (numInserted > 0){
-                        // If no errors, declare a successful transaction.
-                        // database will not populate if this is not called
-                        db.setTransactionSuccessful();
-                    }
-                } finally {
-                    // all transactions occur at once
-                    db.endTransaction();
-                }
-                if (numInserted > 0){
-                    // if there was successful insertion, notify the content resolver that there
-                    // was a change
-                    notifyResolverChange(getContext(), uri);
-                }
-                return numInserted;
+                tableName = MovieContract.ReviewEntry.TABLE_REVIEWS;
+                labelColumn = MovieContract.ReviewEntry.COLUMN_AUTHOR;
+                break;
             default:
                 return super.bulkInsert(uri, values);
         }
+        // allows for multiple transactions
+        db.beginTransaction();
+
+        // keep track of successful inserts
+        int numInserted = 0;
+        try {
+            for (ContentValues value : values) {
+                if (value == null){
+                    throw new IllegalArgumentException("Cannot have null content values");
+                }
+                long _id = -1;
+                try {
+                    _id = db.insertOrThrow(tableName, null, value);
+                } catch(SQLiteConstraintException e) {
+                    Log.w(LOG_TAG, "Attempting to insert " +
+                            value.getAsString(labelColumn) +
+                            " but received SQLite error: " + e);
+                }
+                if (_id != -1){
+                    numInserted++;
+                }
+            }
+            if (numInserted > 0){
+                // If no errors, declare a successful transaction.
+                // database will not populate if this is not called
+                db.setTransactionSuccessful();
+            }
+        } finally {
+            // all transactions occur at once
+            db.endTransaction();
+        }
+        if (numInserted > 0){
+            // if there was successful insertion, notify the content resolver that there
+            // was a change
+            notifyResolverChange(getContext(), uri);
+        }
+        return numInserted;
     }
 
     @Override
@@ -373,7 +340,7 @@ public class MovieProvider extends ContentProvider {
             case MOVIE_WITH_ID: {
                 numUpdated = db.update(MovieContract.MovieEntry.TABLE_MOVIES,
                         contentValues,
-                        MovieContract.MovieEntry.COLUMN_TMDB_ID + " = ?",
+                        MovieContract.MovieEntry._ID + " = ?",
                         new String[] {String.valueOf(ContentUris.parseId(uri))});
                 break;
             }

@@ -152,7 +152,7 @@ public class TestProvider extends AndroidTestCase {
         Log.d(LOG_TAG, "New row id: " + movieRowId);
 
         ContentValues updatedValues = new ContentValues(values);
-        updatedValues.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, movieRowId);
+        updatedValues.put(MovieContract.MovieEntry._ID, movieRowId);
         updatedValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Breathless");
         updatedValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, "1961-02-07");
 
@@ -162,7 +162,7 @@ public class TestProvider extends AndroidTestCase {
         int count = mContext.getContentResolver().update(
                 MovieContract.MovieEntry.CONTENT_URI,
                 updatedValues,
-                MovieContract.MovieEntry.COLUMN_TMDB_ID + "= ?",
+                MovieContract.MovieEntry._ID + "= ?",
                 new String[]{Long.toString(movieRowId)});
         assertEquals(count, 1);
 
@@ -174,7 +174,7 @@ public class TestProvider extends AndroidTestCase {
         Cursor cursor = mContext.getContentResolver().query(
                 MovieContract.MovieEntry.CONTENT_URI,
                 null,
-                MovieContract.MovieEntry.COLUMN_TMDB_ID + " = " + movieRowId,
+                MovieContract.MovieEntry._ID + " = " + movieRowId,
                 null,
                 null
         );
@@ -275,7 +275,7 @@ public class TestProvider extends AndroidTestCase {
         ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_RECORDS_TO_INSERT];
         for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++) {
             ContentValues movieValues = new ContentValues();
-            movieValues.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, 8382 + i);
+            movieValues.put(MovieContract.MovieEntry._ID, 8382 + i);
             movieValues.put(MovieContract.MovieEntry.COLUMN_ICON, 1324 - i);
             movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE,
                     "Vivre sa vie " + Integer.toString(i));
@@ -334,7 +334,7 @@ public class TestProvider extends AndroidTestCase {
                 null,
                 null,
                 null,
-                MovieContract.MovieEntry.COLUMN_TMDB_ID // sort order, by TMDB_ID descending
+                MovieContract.MovieEntry._ID // sort order, by TMDB_ID descending
         );
 
         if (cursor != null) {

@@ -20,7 +20,7 @@ public class TestUtilities extends AndroidTestCase {
 
     static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, 8382);
+        movieValues.put(MovieContract.MovieEntry._ID, 8382);
         movieValues.put(MovieContract.MovieEntry.COLUMN_ICON, 1324);
         movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE, "Vivre sa vie");
         movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW,

@@ -9,7 +9,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
     private static final String LOG_TAG = MovieDBHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME = "movies.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     public MovieDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -19,10 +19,10 @@ public class MovieDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " +
                 MovieContract.MovieEntry.TABLE_MOVIES + "(" +
-                MovieContract.MovieEntry.COLUMN_TMDB_ID +
+                MovieContract.MovieEntry._ID +
                 " INTEGER PRIMARY KEY," +
                 MovieContract.MovieEntry.COLUMN_ICON +
-                " INTEGER NOT NULL," +
+                " INTEGER," +
                 MovieContract.MovieEntry.COLUMN_ORIG_TITLE +
                 " TEXT NOT NULL," +
                 MovieContract.MovieEntry.COLUMN_OVERVIEW +
@@ -41,7 +41,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 " INTEGER NOT NULL," +
 
                 // ensure new movie information results in an update
-                " UNIQUE (" + MovieContract.MovieEntry.COLUMN_TMDB_ID +
+                " UNIQUE (" + MovieContract.MovieEntry._ID +
                 ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_REVIEW_TABLE = "CREATE TABLE " +
@@ -64,7 +64,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 // link movie_id column as foreign key to the movie table
                 " FOREIGN KEY (" + MovieContract.ReviewEntry.COLUMN_MOVIE_ID +
                 ") REFERENCES " + MovieContract.MovieEntry.TABLE_MOVIES +
-                " (" + MovieContract.MovieEntry.COLUMN_TMDB_ID + "))";
+                " (" + MovieContract.MovieEntry._ID + "))";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_REVIEW_TABLE);
