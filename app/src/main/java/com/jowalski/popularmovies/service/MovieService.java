@@ -1,29 +1,19 @@
 package com.jowalski.popularmovies.service;
 
 import android.app.IntentService;
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
 
-import com.jowalski.popularmovies.BuildConfig;
 import com.jowalski.popularmovies.MainActivityFragment;
-import com.jowalski.popularmovies.Movie;
 import com.jowalski.popularmovies.data.MovieContract;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.List;
 import java.util.Vector;
+
+import retrofit.Call;
+import retrofit.Response;
 
 /**
  * Created by jowalski on 12/14/15.
@@ -32,28 +22,10 @@ public class MovieService extends IntentService {
     public static final String SORT_ORDER_EXTRA = "sort_order";
     public static final String NOTIFY_RESOLVER_EXTRA = "notify_resolver";
 
-
     private static final String LOG_TAG = MovieService.class.getSimpleName();
 
-    private static final String THE_MOVIE_DB_BASE_API_URL = "https://api.themoviedb.org/3/";
-    private static final String DISCOVER_MOVIE_ENDPOINT = "discover/movie";
-
-    // themoviedb api uri fields
-    private static final String SORT_BY_PARAM = "sort_by";
-    private static final String SORT_BY_VALUE_POP = "popularity.desc";
-    private static final String SORT_BY_VALUE_VOTE = "vote_average.desc";
-    private static final String API_KEY_PARAM = "api_key";
-
-    // movie info element fields
-    private static final String TMDB_ID = "id";
-    private static final String TMDB_ORIG_TITLE = "original_title";
-    private static final String TMDB_OVERVIEW = "overview";
-    private static final String TMDB_RELEASE_DATE = "release_date";
-    private static final String TMDB_POSTER_PATH = "poster_path";
-    private static final String TMDB_POPULARITY = "popularity";
-    private static final String TMDB_TITLE = "title";
-    private static final String TMDB_VOTE_AVG = "vote_average";
-    private static final String TMDB_VOTE_CNT = "vote_count";
+    public static final String SORT_BY_VALUE_POP = "popularity.desc";
+    public static final String SORT_BY_VALUE_VOTE = "vote_average.desc";
 
     // fields for constructing the posterPath
     private static final String THE_MOVIE_DB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
@@ -71,107 +43,26 @@ public class MovieService extends IntentService {
         super("Movie");
     }
 
+    private static TMDBService.TMDBApi mTmdbApi =
+            TMDBService.createApi();
+
     @Override
     protected void onHandleIntent(Intent intent) {
-        int sortOrder = intent.getIntExtra(SORT_ORDER_EXTRA,
-                MainActivityFragment.SORT_ORDER_BY_POPULARITY);
-
-        boolean notifyResolver = intent.getBooleanExtra(NOTIFY_RESOLVER_EXTRA, true);
-
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
 
         try {
-            String base_url = THE_MOVIE_DB_BASE_API_URL +
-                    DISCOVER_MOVIE_ENDPOINT + "?";
+            Call<TMDBService.MoviePage> call =
+                    mTmdbApi.discoverMovies(getSortByValue(intent), 1);
+            Response<TMDBService.MoviePage> response = call.execute();
 
-            String sort_by_value = SORT_BY_VALUE_POP;
-            switch (sortOrder) {
-                case MainActivityFragment.SORT_ORDER_BY_POPULARITY:
-                    sort_by_value = SORT_BY_VALUE_POP;
-                    break;
-                case MainActivityFragment.SORT_ORDER_BY_RATING:
-                    sort_by_value = SORT_BY_VALUE_VOTE;
-                    break;
-            }
-
-            Uri builtUri = Uri.parse(base_url).buildUpon()
-                    .appendQueryParameter(SORT_BY_PARAM, sort_by_value)
-                    .appendQueryParameter(API_KEY_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY)
-                    .build();
-
-            URL url = new URL(builtUri.toString());
-
-            // Create the connection to themoviedb.org
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            // Read the input stream
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuilder buffer = new StringBuilder();
-            if (inputStream == null) {
-                return;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // adding a newline to make debugging easier
-                buffer.append(line)
-                        .append("\n");
-            }
-
-            if (buffer.length() == 0) {
-                // empty stream so no point in parsing
+            if (!response.isSuccess()) {
                 return;
             }
 
-            String moviesJsonStr = buffer.toString();
-            getMoviesInfoFromJson(moviesJsonStr);
-            if (notifyResolver) {
-                getContentResolver().notifyChange(MovieContract.MovieEntry.CONTENT_URI, null);
-            }
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Could not fetch the movie com.jowalski.popularmovies.data", e);
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
-        }
-    }
+            List<TMDBService.Movie> movies = response.body().results;
 
-    private void getMoviesInfoFromJson(String moviesJsonStr)  {
-        // each Json result consists of these top-level elements,
-        // the 'results' field contains the movie info elements
-        final String TMDB_RESULTS = "results";
-        // NOTE: not using these now, but may need them for content provider?
-        // final String TMDB_PAGE = "page";
-        // final String TMDB_TOT_PAGES = "total_pages";
-        // final String TMDB_TOT_RESULTS = "total_results";
-
-        Movie[] moviesArray;
-        try {
-            JSONObject moviesJson = new JSONObject(moviesJsonStr);
-            JSONArray moviesJSONArray = moviesJson.getJSONArray(TMDB_RESULTS);
-            // int tmdb_page = moviesJson.getInt(TMDB_PAGE);
-            // int tmdb_totPages = moviesJson.getInt(TMDB_TOT_PAGES);
-            // int tmdb_totResults = moviesJson.getInt(TMDB_TOT_RESULTS);
-
-            moviesArray = new Movie[moviesJSONArray.length()];
-            Vector<ContentValues> cVVector = new Vector<>(moviesArray.length);
-
-            for (int i = 0; i < moviesJSONArray.length(); i++) {
-                JSONObject movieJson = moviesJSONArray.getJSONObject(i);
-                moviesArray[i] = newMovieFromJson(movieJson);
-                cVVector.add(newCVFromMovie(moviesArray[i]));
+            Vector<ContentValues> cVVector = new Vector<>(movies.size());
+            for (int i = 0; i < cVVector.size(); i++) {
+                cVVector.add(newCVFromTMDBMovie(movies.get(i)));
             }
 
             if (cVVector.size() > 0) {
@@ -179,52 +70,48 @@ public class MovieService extends IntentService {
                 cVVector.toArray(cvArray);
                 this.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
             }
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
+
+            if (notifyResolver(intent)) {
+                getContentResolver().notifyChange(MovieContract.MovieEntry.CONTENT_URI, null);
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error fetching from TMDB server", e);
         }
     }
 
-    private Movie newMovieFromJson(JSONObject movieJson) throws JSONException {
-        Movie movie = new Movie();
-        movie.movieId = movieJson.getInt(TMDB_ID);
-        movie.origTitle = movieJson.getString(TMDB_ORIG_TITLE);
-        movie.overview = movieJson.getString(TMDB_OVERVIEW);
-        movie.releaseDate = movieJson.getString(TMDB_RELEASE_DATE);
-        movie.popularity = movieJson.getDouble(TMDB_POPULARITY);
-        movie.title = movieJson.getString(TMDB_TITLE);
-        movie.vote_average = movieJson.getDouble(TMDB_VOTE_AVG);
-        movie.vote_count = movieJson.getInt(TMDB_VOTE_CNT);
-
-        movie.posterPath = THE_MOVIE_DB_BASE_IMAGE_URL + POSTER_SIZE_W185 +
-                movieJson.getString(TMDB_POSTER_PATH);
-
-        return movie;
+    private boolean notifyResolver(Intent intent) {
+        return intent.getBooleanExtra(NOTIFY_RESOLVER_EXTRA, true);
     }
 
-    private ContentValues newCVFromMovie(Movie movie) {
+    private String getSortByValue(Intent intent) {
+        int sortOrder = intent.getIntExtra(SORT_ORDER_EXTRA,
+                MainActivityFragment.SORT_ORDER_BY_POPULARITY);
+
+        String sort_by_value = SORT_BY_VALUE_POP;
+        switch (sortOrder) {
+            case MainActivityFragment.SORT_ORDER_BY_POPULARITY:
+                sort_by_value = SORT_BY_VALUE_POP;
+                break;
+            case MainActivityFragment.SORT_ORDER_BY_RATING:
+                sort_by_value = SORT_BY_VALUE_VOTE;
+                break;
+        }
+        return sort_by_value;
+    }
+
+    private ContentValues newCVFromTMDBMovie(TMDBService.Movie movie) {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieEntry._ID, movie.movieId);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE, movie.origTitle);
+        movieValues.put(MovieContract.MovieEntry._ID, movie.id);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE, movie.originalTitle);
         movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.overview);
         movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.releaseDate);
         movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.posterPath);
         movieValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, movie.popularity);
         movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.title);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.vote_average);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, movie.vote_count);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.voteAverage);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, movie.voteCount);
 
         return movieValues;
     }
 
-    public static class AlarmReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Intent sendIntent = new Intent(context, MovieService.class);
-            sendIntent.putExtra(MovieService.SORT_ORDER_EXTRA, intent.getStringExtra(MovieService.SORT_ORDER_EXTRA));
-            context.startService(sendIntent);
-
-        }
-    }
 }
