@@ -1,14 +1,11 @@
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.jowalski.popularmovies.AutofitRecyclerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/gridview_movies"
+    android:id="@+id/recyclerview_movies"
+    android:scrollbars="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:columnWidth="120dp"
-    android:horizontalSpacing="0dp"
-    android:numColumns="auto_fit"
-    android:stretchMode="columnWidth"
-    android:verticalSpacing="0dp"
     tools:context=".MainActivityFragment"
     tools:showIn="@layout/activity_main">
-
-</GridView>
+</com.jowalski.popularmovies.AutofitRecyclerView>

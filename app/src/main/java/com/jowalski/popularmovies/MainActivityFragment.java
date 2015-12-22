@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,8 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
 import com.jowalski.popularmovies.data.MovieContract;
 import com.jowalski.popularmovies.service.MovieService;
@@ -34,8 +33,6 @@ public class MainActivityFragment extends Fragment
 
     public static final int SORT_ORDER_BY_POPULARITY = 0;
     public static final int SORT_ORDER_BY_RATING = 1;
-
-    private static final String MOVIE_ID_EXTRA = "movie_id";
 
     private static final int MOVIE_LOADER = 0;
 
@@ -99,27 +96,11 @@ public class MainActivityFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mMovieAdapter = new MovieAdapter(getActivity(), null, 0);
-
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movies);
-        gridView.setAdapter(mMovieAdapter);
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
-                int movieId;
-                if (cursor != null) {
-                    movieId = cursor.getInt(COL_MOVIE_TMDB_ID);
-                    Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-                    intent.putExtra(MOVIE_ID_EXTRA, movieId);
-                    startActivity(intent);
-                }
-            }
-        });
-
-        return rootView;
+        AutofitRecyclerView rv = (AutofitRecyclerView) inflater.inflate(
+                R.layout.fragment_main, container, false);
+        mMovieAdapter = new MovieAdapter(getContext(), null);
+        rv.setAdapter(mMovieAdapter);
+        return rv;
     }
 
     @Override

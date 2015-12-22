@@ -27,10 +27,9 @@ public class TestApi extends AndroidTestCase {
 
     public void testMovieEndpoint() {
         try {
-            Call<List<TMDBService.Movie>> call =
-                    mTmdbApi.discoverMovies(MovieService.SORT_BY_VALUE_POP);
-
-            Response<List<TMDBService.Movie>> response = call.execute();
+            Call<TMDBService.MoviePage> call =
+                    mTmdbApi.discoverMovies(MovieService.SORT_BY_VALUE_POP, 1);
+            Response<TMDBService.MoviePage> response = call.execute();
 
             if (!response.isSuccess()) {
                 assertTrue("API response error:\n" +
@@ -38,30 +37,11 @@ public class TestApi extends AndroidTestCase {
                         false);
                 return;
             }
-            List<TMDBService.Movie> movies = response.body();
+            List<TMDBService.Movie> movies = response.body().results;
             assertEquals(20, movies.size());
         } catch (IOException e) {
             assertTrue("Error: Problem with movies API " + e, false);
         }
     }
 
-    public void testReviewEndpoint() {
-        try {
-            Call<List<TMDBService.Review>> call =
-                    mTmdbApi.getReviews(FANTASTIC_FOUR_MOVIE_ID);
-
-            Response<List<TMDBService.Review>> response = call.execute();
-
-            if (!response.isSuccess()) {
-                assertTrue("API response error:\n" +
-                                response.errorBody().string(),
-                        false);
-                return;
-            }
-            List<TMDBService.Review> reviews = response.body();
-            assertEquals(20, reviews.size());
-        } catch (IOException e) {
-            assertTrue("Error: Problem with reviews API " + e, false);
-        }
-    }
 }
