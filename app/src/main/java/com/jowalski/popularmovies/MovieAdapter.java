@@ -3,7 +3,6 @@ package com.jowalski.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,29 +23,17 @@ import butterknife.ButterKnife;
  * https://gist.github.com/skyfishjy/443b7448f59be978bc59
  *
  */
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+public class MovieAdapter extends CursorRecyclerViewAdapter<MovieAdapter.ViewHolder> {
+
     private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
-
-    private Context mContext;
-    private boolean mDataValid;
-    private Cursor mCursor;
-    private int mRowIdColumn;
-    private DataSetObserver mDataSetObserver;
-
     private static final String MOVIE_ID_EXTRA = "movie_id";
 
+    Context mContext;
+
     public MovieAdapter(Context context, Cursor cursor) {
+        super(context, cursor);
+
         mContext = context;
-        mCursor = cursor;
-        mDataValid = cursor != null;
-        mRowIdColumn = mDataValid ? cursor.getColumnIndexOrThrow("_id") : -1;
-
-        mDataSetObserver = new NotifyingDataSetObserver();
-        if (mCursor != null) {
-            mCursor.registerDataSetObserver(mDataSetObserver);
-        }
-
-        setHasStableIds(true);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder
@@ -72,14 +59,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     }
 
     @Override
-    public long getItemId(int position) {
-        if (mDataValid && mCursor != null && mCursor.moveToPosition(position)) {
-            return mCursor.getLong(mRowIdColumn);
-        }
-        return 0;
-    }
-
-    @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.movie_poster_item, parent, false);
@@ -91,19 +70,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        if (!mDataValid) {
-            throw new IllegalStateException(
-                    "this should only be called when the cursor is valid");
-        }
-        if (!mCursor.moveToPosition(position)) {
-            throw new IllegalStateException(
-                    "couldn't move cursor to position " + position);
-        }
-
+    public void onBindViewHolder(ViewHolder holder, Cursor cursor) {
         // tell the viewholder what the movieId is, so the click handler knows
-        holder.mMovieId = mCursor.getInt(MainActivityFragment.COL_MOVIE_TMDB_ID);
-        String posterPath = mCursor.getString(MainActivityFragment.COL_POSTER_PATH);
+        holder.mMovieId = cursor.getInt(MainActivityFragment.COL_MOVIE_TMDB_ID);
+        String posterPath = cursor.getString(MainActivityFragment.COL_POSTER_PATH);
 
         Picasso.with(mContext)
                 .load(posterPath)
@@ -112,61 +82,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
                 .into(holder.mIconView);
 
         // TODO: 12/14/15 load accessibility text
-    }
-
-    @Override
-    public int getItemCount() {
-        if (mDataValid && mCursor != null) {
-            return mCursor.getCount();
-        }
-        return 0;
-    }
-
-    public void changeCursor(Cursor cursor) {
-        Cursor old = swapCursor(cursor);
-        if (old != null) {
-            old.close();
-        }
-    }
-
-    public Cursor swapCursor(Cursor newCursor) {
-        if (newCursor == mCursor) {
-            return null;
-        }
-        final Cursor oldCursor = mCursor;
-        if (oldCursor != null && mDataSetObserver != null) {
-            oldCursor.unregisterDataSetObserver(mDataSetObserver);
-        }
-        mCursor = newCursor;
-        if (mCursor != null) {
-            if (mDataSetObserver != null) {
-                mCursor.registerDataSetObserver(mDataSetObserver);
-            }
-            mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
-            mDataValid = true;
-            notifyDataSetChanged();
-        } else {
-            mRowIdColumn = -1;
-            mDataValid = false;
-            notifyItemRangeRemoved(0, getItemCount());
-        }
-        return oldCursor;
-    }
-
-    private class NotifyingDataSetObserver extends DataSetObserver {
-        @Override
-        public void onChanged() {
-            super.onChanged();
-            mDataValid = true;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public void onInvalidated() {
-            super.onInvalidated();
-            mDataValid = false;
-            notifyItemRangeRemoved(0, getItemCount());
-        }
     }
 }
 

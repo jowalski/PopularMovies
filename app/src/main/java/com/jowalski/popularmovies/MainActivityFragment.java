@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,6 +54,8 @@ public class MainActivityFragment extends Fragment
 
     private ArrayList<Movie> movieList;
 
+    private static final int ITEMS_PER_PAGE = 20;
+
     public MainActivityFragment() {
     }
 
@@ -60,7 +64,6 @@ public class MainActivityFragment extends Fragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        updateMovies(getContext(), SORT_ORDER_BY_POPULARITY, true);
         Log.d(LOG_TAG, "onCreate: updated Movie database");
     }
 
@@ -77,11 +80,11 @@ public class MainActivityFragment extends Fragment
             // when GridView successfully updated
             if (!item.isChecked()) {
                 // sort by rating
-                updateMovies(getContext(), SORT_ORDER_BY_RATING, true);
+                updateMovies(getContext(), SORT_ORDER_BY_RATING, 1, true);
                 item.setChecked(true);
             } else {
                 // sort by popularity
-                updateMovies(getContext(), SORT_ORDER_BY_POPULARITY, true);
+                updateMovies(getContext(), SORT_ORDER_BY_POPULARITY, 1, true);
                 item.setChecked(false);
             }
         }
@@ -100,6 +103,14 @@ public class MainActivityFragment extends Fragment
                 R.layout.fragment_main, container, false);
         mMovieAdapter = new MovieAdapter(getContext(), null);
         rv.setAdapter(mMovieAdapter);
+
+        rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(
+                (GridLayoutManager) rv.getLayoutManager()) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                updateMovies(getContext(), SORT_ORDER_BY_POPULARITY, page, false);
+            }
+        });
         return rv;
     }
 
@@ -109,11 +120,12 @@ public class MainActivityFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
     }
 
-    private void updateMovies(Context context, int movieSortOrder,
-                              boolean notifyResolver) {
-        Intent movieIntent = new Intent(getContext(), MovieService.class);
+    static public void updateMovies(Context context, int movieSortOrder,
+                              int pageNumber, boolean notifyResolver) {
+        Intent movieIntent = new Intent(context, MovieService.class);
         movieIntent.putExtra(MovieService.SORT_ORDER_EXTRA, movieSortOrder);
         movieIntent.putExtra(MovieService.NOTIFY_RESOLVER_EXTRA, notifyResolver);
+        movieIntent.putExtra(MovieService.PAGE_NUMBER_EXTRA, pageNumber);
         context.startService(movieIntent);
     }
 
@@ -129,6 +141,9 @@ public class MainActivityFragment extends Fragment
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor.getCount() < ITEMS_PER_PAGE) {
+            updateMovies(getContext(), SORT_ORDER_BY_POPULARITY, 1, true);
+        }
         mMovieAdapter.swapCursor(cursor);
     }
 
@@ -137,4 +152,69 @@ public class MainActivityFragment extends Fragment
         mMovieAdapter.swapCursor(null);
     }
 
+    /**
+     * Automatically fetches items from the web database as the user scrolls down.
+     * This code mostly comes from:
+     *
+     * https://github.com/codepath/android_guides/wiki/Endless-Scrolling-with-AdapterViews-and-RecyclerView
+     */
+    public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
+        // The minimum amount of items to have below your current scroll position
+        // before loading more.
+        private int visibleThreshold = 5;
+        // The current offset index of data you have loaded
+        private int currentPage = 0;
+        // The total number of items in the dataset after the last load
+        private int previousTotalItemCount = 0;
+        // True if we are still waiting for the last set of data to load.
+        private boolean loading = false;
+        // Sets the starting page index
+        private int startingPageIndex = 0;
+
+        private LinearLayoutManager mLinearLayoutManager;
+
+        public EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
+            this.mLinearLayoutManager = layoutManager;
+        }
+
+        // This happens many times a second during a scroll, so be wary of the code you place here.
+        // We are given a few useful parameters to help us work out if we need to load some more data,
+        // but first we check if we are waiting for the previous load to finish.
+        @Override
+        public void onScrolled(RecyclerView view, int dx, int dy) {
+            int firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+            int visibleItemCount = view.getChildCount();
+            int totalItemCount = mLinearLayoutManager.getItemCount();
+
+            // If the total item count is zero and the previous isn't, assume the
+            // list is invalidated and should be reset back to initial state
+            if (totalItemCount < previousTotalItemCount) {
+                this.currentPage = this.startingPageIndex;
+                this.previousTotalItemCount = totalItemCount;
+                if (totalItemCount == 0) {
+                    this.loading = true;
+                }
+            }
+            // If it’s still loading, we check to see if the dataset count has
+            // changed, if so we conclude it has finished loading and update the current page
+            // number and total item count.
+            if (loading && (totalItemCount > previousTotalItemCount)) {
+                currentPage = totalItemCount / ITEMS_PER_PAGE;
+                loading = false;
+                previousTotalItemCount = totalItemCount;
+            }
+
+            // If it isn’t currently loading, we check to see if we have breached
+            // the visibleThreshold and need to reload more data.
+            // If we do need to reload some more data, we execute onLoadMore to fetch the data.
+            if (!loading && (totalItemCount - visibleItemCount) <=
+                    (firstVisibleItem + visibleThreshold)) {
+                onLoadMore(currentPage + 1, totalItemCount);
+                loading = true;
+            }
+        }
+
+        // Defines the process for actually loading more data based on page
+        public abstract void onLoadMore(int page, int totalItemsCount);
+    }
 }

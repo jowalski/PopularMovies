@@ -21,6 +21,7 @@ import retrofit.Response;
 public class MovieService extends IntentService {
     public static final String SORT_ORDER_EXTRA = "sort_order";
     public static final String NOTIFY_RESOLVER_EXTRA = "notify_resolver";
+    public static final String PAGE_NUMBER_EXTRA = "page_number";
 
     private static final String LOG_TAG = MovieService.class.getSimpleName();
 
@@ -28,7 +29,7 @@ public class MovieService extends IntentService {
     public static final String SORT_BY_VALUE_VOTE = "vote_average.desc";
 
     // fields for constructing the posterPath
-    private static final String THE_MOVIE_DB_BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
+    private static final String BASE_URL_PATH = "http://image.tmdb.org/t/p/";
 
     // these are all (?) possible image sizes
     // final String POSTER_SIZE_W92 = "w92";
@@ -51,7 +52,8 @@ public class MovieService extends IntentService {
 
         try {
             Call<TMDBService.MoviePage> call =
-                    mTmdbApi.discoverMovies(getSortByValue(intent), 1);
+                    mTmdbApi.discoverMovies(getSortByValue(intent),
+                            intent.getIntExtra(PAGE_NUMBER_EXTRA, 1));
             Response<TMDBService.MoviePage> response = call.execute();
 
             if (!response.isSuccess()) {
@@ -61,7 +63,7 @@ public class MovieService extends IntentService {
             List<TMDBService.Movie> movies = response.body().results;
 
             Vector<ContentValues> cVVector = new Vector<>(movies.size());
-            for (int i = 0; i < cVVector.size(); i++) {
+            for (int i = 0; i < movies.size(); i++) {
                 cVVector.add(newCVFromTMDBMovie(movies.get(i)));
             }
 
@@ -105,13 +107,18 @@ public class MovieService extends IntentService {
         movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE, movie.originalTitle);
         movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.overview);
         movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.releaseDate);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.posterPath);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH,
+                constructPosterPath(movie.posterPath));
         movieValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, movie.popularity);
         movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.title);
         movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.voteAverage);
         movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, movie.voteCount);
 
         return movieValues;
+    }
+
+    private String constructPosterPath(String queryPath) {
+        return BASE_URL_PATH + POSTER_SIZE_W185 + queryPath;
     }
 
 }

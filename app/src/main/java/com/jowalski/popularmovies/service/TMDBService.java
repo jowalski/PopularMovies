@@ -1,5 +1,6 @@
 package com.jowalski.popularmovies.service;
 
+import com.google.gson.annotations.SerializedName;
 import com.jowalski.popularmovies.BuildConfig;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.Interceptor;
@@ -25,6 +26,21 @@ public class TMDBService {
 
     public static final String BASE_URL = "http://api.themoviedb.org/3/";
 
+    public interface TMDBApi {
+        // @Headers("Accept: application/json")
+        @GET("discover/movie")
+        Call<MoviePage> discoverMovies(@Query("sort_by") String sortBy,
+                                       @Query("page") int page);
+
+        @GET("movie/{id}/reviews")
+        Call<List<Review>> getReviews(@Path("id") int movieId,
+                                      @Query("page") int page);
+
+        @GET("movie/{id}/videos")
+        Call<List<Video>> getVideos(@Path("id") int movieId,
+                                    @Query("page") int page);
+    }
+
     public static TMDBApi createApi() {
         OkHttpClient okClient = new OkHttpClient();
         okClient.interceptors()
@@ -42,21 +58,6 @@ public class TMDBService {
                 .build();
 
         return retrofit.create(TMDBApi.class);
-    }
-
-    public interface TMDBApi {
-        // @Headers("Accept: application/json")
-        @GET("discover/movie")
-        Call<MoviePage> discoverMovies(@Query("sort_by") String sortBy,
-                                       @Query("page") int page);
-
-        @GET("movie/{id}/reviews")
-        Call<List<Review>> getReviews(@Path("id") int movieId,
-                                      @Query("page") int page);
-
-        @GET("movie/{id}/videos")
-        Call<List<Video>> getVideos(@Path("id") int movieId,
-                                    @Query("page") int page);
     }
 
     /**
@@ -94,7 +95,9 @@ public class TMDBService {
     public class ReviewPage {
         public int page;
         public List<Review> results = new ArrayList<Review>();
+        @SerializedName("total_results")
         public int totalResults;
+        @SerializedName("total_pages")
         public int totalPages;
     }
 
@@ -108,7 +111,9 @@ public class TMDBService {
     public class VideoPage {
         public int page;
         public List<Video> results = new ArrayList<Video>();
+        @SerializedName("total_results")
         public int totalResults;
+        @SerializedName("total_pages")
         public int totalPages;
     }
 
@@ -125,25 +130,33 @@ public class TMDBService {
     public class MoviePage {
         public int page;
         public List<TMDBService.Movie> results = new ArrayList<TMDBService.Movie>();
+        @SerializedName("total_results")
         public int totalResults;
+        @SerializedName("total_pages")
         public int totalPages;
     }
 
     public class Movie {
         public boolean adult;
+        @SerializedName("backdrop_path")
         public String backdropPath;
         public List<Long> genreIds = new ArrayList<Long>();
         public int id;
+        @SerializedName("original_language")
         public String originalLanguage;
+        @SerializedName("original_title")
         public String originalTitle;
         public String overview;
+        @SerializedName("release_date")
         public String releaseDate;
+        @SerializedName("poster_path")
         public String posterPath;
         public float popularity;
         public String title;
         public boolean video;
+        @SerializedName("vote_average")
         public float voteAverage;
+        @SerializedName("vote_count")
         public int voteCount;
     }
 }
-

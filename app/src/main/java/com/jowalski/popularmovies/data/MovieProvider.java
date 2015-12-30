@@ -89,7 +89,7 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-                return retCursor;
+                break;
             }
             // Individual movie based on Id selected
             case MOVIE_WITH_ID: {
@@ -101,7 +101,7 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-                return retCursor;
+                break;
             }
             case MOVIE_WITH_REVIEWS: {
                 retCursor = sMoviewReviewsQueryBuilder.query(
@@ -112,7 +112,7 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-                return retCursor;
+                break;
             }
             case MOVIE_WITH_REVIEWS_WITH_ID: {
                 retCursor = sMoviewReviewsQueryBuilder.query(
@@ -123,7 +123,7 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-                return retCursor;
+                break;
             }
             case REVIEW: {
                 // All reviews selected
@@ -135,7 +135,7 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-                return retCursor;
+                break;
             }
             case REVIEW_WITH_ID: {
                 // single review with matching _id
@@ -147,7 +147,7 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-                return retCursor;
+                break;
             }
             case REVIEW_WITH_MOVIE_ID: {
                 // All reviews matching the specified MOVIE_ID
@@ -159,13 +159,19 @@ public class MovieProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-                return retCursor;
+                break;
             }
             default: {
                 // By default, we assume a bad URI
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
         }
+        if (getContext() != null) {
+            retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        } else {
+            throw new Error("unable to set cursor notification URI");
+        }
+        return retCursor;
     }
 
     @Override
