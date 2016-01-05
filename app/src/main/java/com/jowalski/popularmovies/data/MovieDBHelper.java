@@ -39,6 +39,12 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 " REAL NOT NULL," +
                 MovieContract.MovieEntry.COLUMN_VOTE_COUNT +
                 " INTEGER NOT NULL," +
+                MovieContract.MovieEntry.COLUMN_POPULARITY_QUERY +
+                " INTEGER DEFAULT 0," +
+                MovieContract.MovieEntry.COLUMN_RATING_QUERY +
+                " INTEGER DEFAULT 0," +
+                MovieContract.MovieEntry.COLUMN_FAVORITE +
+                " INTEGER DEFAULT 0," +
 
                 // ensure new movie information results in an update
                 " UNIQUE (" + MovieContract.MovieEntry._ID +

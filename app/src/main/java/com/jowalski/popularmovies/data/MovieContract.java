@@ -27,6 +27,9 @@ public class MovieContract {
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
         public static final String COLUMN_VOTE_COUNT = "vote_count";
+        public static final String COLUMN_POPULARITY_QUERY = "popularity_query";
+        public static final String COLUMN_RATING_QUERY = "rating_query";
+        public static final String COLUMN_FAVORITE = "favorite";
 
         // create content uri
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()

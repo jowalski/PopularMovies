@@ -51,8 +51,9 @@ public class MovieService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         try {
+            String sortOrder = getSortByValue(intent);
             Call<TMDBService.MoviePage> call =
-                    mTmdbApi.discoverMovies(getSortByValue(intent),
+                    mTmdbApi.discoverMovies(sortOrder,
                             intent.getIntExtra(PAGE_NUMBER_EXTRA, 1));
             Response<TMDBService.MoviePage> response = call.execute();
 
@@ -64,7 +65,7 @@ public class MovieService extends IntentService {
 
             Vector<ContentValues> cVVector = new Vector<>(movies.size());
             for (int i = 0; i < movies.size(); i++) {
-                cVVector.add(newCVFromTMDBMovie(movies.get(i)));
+                cVVector.add(newCVFromTMDBMovie(movies.get(i), sortOrder));
             }
 
             if (cVVector.size() > 0) {
@@ -101,7 +102,7 @@ public class MovieService extends IntentService {
         return sort_by_value;
     }
 
-    private ContentValues newCVFromTMDBMovie(TMDBService.Movie movie) {
+    private ContentValues newCVFromTMDBMovie(TMDBService.Movie movie, String sortOrder) {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieContract.MovieEntry._ID, movie.id);
         movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE, movie.originalTitle);
@@ -114,7 +115,22 @@ public class MovieService extends IntentService {
         movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.voteAverage);
         movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, movie.voteCount);
 
+        markSortOrder(movieValues, sortOrder);
+
         return movieValues;
+    }
+
+    private void markSortOrder(ContentValues mValues, String sortOrder) {
+        switch (sortOrder) {
+            case SORT_BY_VALUE_POP:
+                mValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY_QUERY, 1);
+                break;
+            case SORT_BY_VALUE_VOTE:
+                mValues.put(MovieContract.MovieEntry.COLUMN_RATING_QUERY, 1);
+                break;
+            default:
+                throw new Error("Unknown value in sortOrder");
+        }
     }
 
     private String constructPosterPath(String queryPath) {

@@ -2,7 +2,9 @@ package com.jowalski.popularmovies;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 
 import java.text.SimpleDateFormat;
@@ -24,6 +26,12 @@ public class Utility {
         } else {
             return (DateFormat.getMediumDateFormat(context)).format(relDate);
         }
+    }
+
+    public static String getPreferredSortOrder(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(context.getString(R.string.pref_sort_by_key),
+                context.getString(R.string.pref_sort_by_pop));
     }
 
 }

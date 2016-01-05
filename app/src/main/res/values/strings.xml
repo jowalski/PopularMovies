@@ -13,4 +13,13 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="movie_poster_detail_desc">Movie Poster Image</string>
+    <string name="pref_sort_by_label">Sort by</string>
+    <string name="pref_sort_by_pop">popularity.desc</string>
+    <string name="pref_sort_by_rating">vote_average.desc</string>
+    <string name="pref_sort_by_favorite">favorite</string>
+    <string name="pref_sort_by_label_pop">Popularity</string>
+    <string name="pref_sort_by_label_rating">Rating</string>
+    <string name="pref_sort_by_label_favorite">Favorites</string>
+    <string name="pref_sort_by_key">list_preference</string>
+    <string name="title_activity_settings">Settings</string>
 </resources>
