@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto">-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <!--<item-->
-        <!--android:id="@+id/action_refresh"-->
-        <!--android:title="@string/action_refresh"-->
-        <!--app:showAsAction="never" />-->
+    <!--android:id="@+id/action_refresh"-->
+    <!--android:title="@string/action_refresh"-->
+    <!--app:showAsAction="never" />-->
+    <!--<item-->
+    <!--android:id="@+id/sort_by_rating_checkbox"-->
+    <!--android:title="@string/sort_by_rating"-->
+    <!--android:checkable="true" />-->
+    <!--<item-->
+    <!--android:id="@+id/sort_by_listpreference"-->
+    <!--android:title="@string/sort_by_menu_title" />-->
     <item
-        android:id="@+id/sort_by_rating_checkbox"
-        android:title="@string/sort_by_rating"
-        android:checkable="true" />
+        android:id="@+id/menu_sort_by"
+        android:title="@string/menu_sort_by_label"
+        app:showAsAction="ifRoom">
+        <menu>
+            <group
+                android:id="@+id/menu_sort_by_group"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_sort_by_popularity"
+                    android:checked="true"
+                    android:title="@string/menu_popularity_label" />
+                <item
+                    android:id="@+id/menu_sort_by_rating"
+                    android:title="@string/menu_rating_label" />
+                <item
+                    android:id="@+id/menu_sort_by_favorite"
+                    android:title="@string/menu_favorite_label" />
+            </group>
+        </menu>
+    </item>
 </menu>

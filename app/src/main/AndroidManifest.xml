@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.jowalski.popularmovies">
 
+    <uses-sdk xmlns:tools="http://schemas.android.com/tools"
+        tools:overrideLibrary="android.support.v14.preference" />
+
     <!-- INTERNET permission is needed for PopularMovies to access theMovieDB. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -27,13 +30,6 @@
             android:name=".MovieDetailActivity"
             android:label="@string/title_movie_detail"
             android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.jowalski.popularmovies.MainActivity" />
-        </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jowalski.popularmovies.MainActivity" />

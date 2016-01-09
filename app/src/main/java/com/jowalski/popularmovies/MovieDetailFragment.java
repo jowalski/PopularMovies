@@ -31,7 +31,7 @@ public class MovieDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
+        View rootView = inflater.inflate(R.layout.coordinator_detail, container, false);
 
         // this is called by intent with Movie info
         Intent intent = getActivity().getIntent();

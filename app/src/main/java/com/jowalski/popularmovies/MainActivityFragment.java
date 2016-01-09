@@ -9,9 +9,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,10 +19,8 @@ import android.view.ViewGroup;
 import com.jowalski.popularmovies.data.MovieContract;
 import com.jowalski.popularmovies.service.MovieService;
 
-import java.util.ArrayList;
-
 /**
- * A placeholder fragment containing a simple view.
+ *
  */
 public class MainActivityFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -35,6 +30,7 @@ public class MainActivityFragment extends Fragment
 
     public static final int SORT_ORDER_BY_POPULARITY = 0;
     public static final int SORT_ORDER_BY_RATING = 1;
+    public static final int SORT_ORDER_BY_FAVORITE = 2;
 
     private static final int MOVIE_LOADER = 0;
 
@@ -42,7 +38,11 @@ public class MainActivityFragment extends Fragment
             MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_TITLE,
             MovieContract.MovieEntry.COLUMN_POSTER_PATH,
-            MovieContract.MovieEntry.COLUMN_POPULARITY
+            MovieContract.MovieEntry.COLUMN_POPULARITY,
+            MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieContract.MovieEntry.COLUMN_POPULARITY_QUERY,
+            MovieContract.MovieEntry.COLUMN_RATING_QUERY,
+            MovieContract.MovieEntry.COLUMN_FAVORITE
     };
 
     static final int COL_MOVIE_TMDB_ID = 0;
@@ -52,9 +52,21 @@ public class MainActivityFragment extends Fragment
 
     private MovieAdapter mMovieAdapter;
 
-    private ArrayList<Movie> movieList;
-
     private static final int ITEMS_PER_PAGE = 20;
+
+    private static final String PREF_SORT_ORDER_POPULARITY = "popularity.desc";
+    private static final String PREF_SORT_ORDER_RATING = "vote_average.desc";
+    private static final String PREF_SORT_ORDER_FAVORITE = "favorite";
+
+    private static final String LOADER_ARGS_KEY = "movie_loader_arg";
+
+    private int sortTypeState;
+
+    private static final int SORT_TYPE_POPULARITY = 0;
+    private static final int SORT_TYPE_RATING = 1;
+    private static final int SORT_TYPE_FAVORITE = 2;
+
+    private static final String SORT_TYPE_STATE = "sort_type";
 
     public MainActivityFragment() {
     }
@@ -64,7 +76,11 @@ public class MainActivityFragment extends Fragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        Log.d(LOG_TAG, "onCreate: updated Movie database");
+        if (savedInstanceState != null) {
+            sortTypeState = savedInstanceState.getInt(SORT_TYPE_STATE);
+        } else {
+            sortTypeState = SORT_TYPE_POPULARITY;
+        }
     }
 
     @Override
@@ -73,76 +89,152 @@ public class MainActivityFragment extends Fragment
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        int id;
+        switch (sortTypeState) {
+            case SORT_TYPE_POPULARITY:
+                id = R.id.menu_sort_by_popularity;
+                break;
+            case SORT_TYPE_RATING:
+                id = R.id.menu_sort_by_rating;
+                break;
+            case SORT_TYPE_FAVORITE:
+                id = R.id.menu_sort_by_favorite;
+                break;
+            default:
+                return;
+        }
+        menu.findItem(id).setChecked(true);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.sort_by_rating_checkbox) {
-            // TODO: 11/26/15 item.setChecked() should only be called
-            // when GridView successfully updated
-            if (!item.isChecked()) {
-                // sort by rating
-                updateMovies(getContext(), SORT_ORDER_BY_RATING, 1, true);
+        String sortType;
+        switch (id) {
+            case R.id.menu_sort_by_popularity:
+                sortType = PREF_SORT_ORDER_POPULARITY;
+                sortTypeState = SORT_TYPE_POPULARITY;
                 item.setChecked(true);
-            } else {
-                // sort by popularity
-                updateMovies(getContext(), SORT_ORDER_BY_POPULARITY, 1, true);
-                item.setChecked(false);
-            }
+                break;
+            case R.id.menu_sort_by_rating:
+                sortType = PREF_SORT_ORDER_RATING;
+                sortTypeState = SORT_TYPE_RATING;
+                item.setChecked(true);
+                break;
+            case R.id.menu_sort_by_favorite:
+                sortType = PREF_SORT_ORDER_FAVORITE;
+                sortTypeState = SORT_TYPE_FAVORITE;
+                item.setChecked(true);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+
+        restartMovieLoader(sortType);
+
+        return true;
+    }
+
+    private void restartMovieLoader(String sortType) {
+        Bundle b = new Bundle();
+        b.putString(LOADER_ARGS_KEY, sortType);
+        getLoaderManager().restartLoader(MOVIE_LOADER, b, this);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+
+        outState.putInt(SORT_TYPE_STATE, sortTypeState);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        AutofitRecyclerView rv = (AutofitRecyclerView) inflater.inflate(
-                R.layout.fragment_main, container, false);
+        AutofitRecyclerView rv = (AutofitRecyclerView)
+                inflater.inflate(R.layout.fragment_main, container, false);
         mMovieAdapter = new MovieAdapter(getContext(), null);
         rv.setAdapter(mMovieAdapter);
 
+        // add the endless scroll listener, which loads a new set of
+        // movies from the API at a fixed scrolling interval
         rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(
                 (GridLayoutManager) rv.getLayoutManager()) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                updateMovies(getContext(), SORT_ORDER_BY_POPULARITY, page, false);
+                updateMovies(getContext(), page);
             }
         });
         return rv;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
-        super.onActivityCreated(savedInstanceState);
-    }
+    private void updateMovies(Context context, int pageNumber) {
+        int sortOrder;
+        switch (sortTypeState) {
+            case SORT_TYPE_POPULARITY:
+                sortOrder = SORT_ORDER_BY_POPULARITY;
+                break;
+            case SORT_TYPE_RATING:
+                sortOrder = SORT_ORDER_BY_RATING;
+                break;
+            case SORT_TYPE_FAVORITE:
+                sortOrder = SORT_ORDER_BY_FAVORITE;
+                break;
+            default:
+                throw new IllegalStateException("onLoadFinished");
+        }
 
-    static public void updateMovies(Context context, int movieSortOrder,
-                              int pageNumber, boolean notifyResolver) {
         Intent movieIntent = new Intent(context, MovieService.class);
-        movieIntent.putExtra(MovieService.SORT_ORDER_EXTRA, movieSortOrder);
-        movieIntent.putExtra(MovieService.NOTIFY_RESOLVER_EXTRA, notifyResolver);
+        movieIntent.putExtra(MovieService.SORT_ORDER_EXTRA, sortOrder);
         movieIntent.putExtra(MovieService.PAGE_NUMBER_EXTRA, pageNumber);
         context.startService(movieIntent);
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        Bundle b = new Bundle();
+        b.putString(LOADER_ARGS_KEY, PREF_SORT_ORDER_POPULARITY);
+        getLoaderManager().initLoader(MOVIE_LOADER, b, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String sortType = bundle.getString(LOADER_ARGS_KEY);
+        if (sortType == null) {
+            sortType = PREF_SORT_ORDER_POPULARITY;
+        }
+        String selection, sortOrder;
+        switch (sortType) {
+            case PREF_SORT_ORDER_POPULARITY:
+                selection = MovieContract.MovieEntry.COLUMN_POPULARITY_QUERY + " = 1";
+                sortOrder = MovieContract.MovieEntry.COLUMN_POPULARITY + " DESC";
+                break;
+            case PREF_SORT_ORDER_RATING:
+                selection = MovieContract.MovieEntry.COLUMN_RATING_QUERY + " = 1";
+                sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
+                break;
+            case PREF_SORT_ORDER_FAVORITE:
+                selection = MovieContract.MovieEntry.COLUMN_FAVORITE + " = 1";
+                sortOrder = null;
+                break;
+            default:
+                throw new UnknownError();
+        }
+
         return new CursorLoader(getActivity(),
                 MovieContract.MovieEntry.CONTENT_URI,
                 MOVIE_COLUMNS,
+                selection,
                 null,
-                null,
-                MovieContract.MovieEntry.COLUMN_POPULARITY + " DESC");
+                sortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor.getCount() < ITEMS_PER_PAGE) {
-            updateMovies(getContext(), SORT_ORDER_BY_POPULARITY, 1, true);
+            updateMovies(getContext(), 1);
         }
         mMovieAdapter.swapCursor(cursor);
     }
@@ -150,71 +242,5 @@ public class MainActivityFragment extends Fragment
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mMovieAdapter.swapCursor(null);
-    }
-
-    /**
-     * Automatically fetches items from the web database as the user scrolls down.
-     * This code mostly comes from:
-     *
-     * https://github.com/codepath/android_guides/wiki/Endless-Scrolling-with-AdapterViews-and-RecyclerView
-     */
-    public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
-        // The minimum amount of items to have below your current scroll position
-        // before loading more.
-        private int visibleThreshold = 5;
-        // The current offset index of data you have loaded
-        private int currentPage = 0;
-        // The total number of items in the dataset after the last load
-        private int previousTotalItemCount = 0;
-        // True if we are still waiting for the last set of data to load.
-        private boolean loading = false;
-        // Sets the starting page index
-        private int startingPageIndex = 0;
-
-        private LinearLayoutManager mLinearLayoutManager;
-
-        public EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
-            this.mLinearLayoutManager = layoutManager;
-        }
-
-        // This happens many times a second during a scroll, so be wary of the code you place here.
-        // We are given a few useful parameters to help us work out if we need to load some more data,
-        // but first we check if we are waiting for the previous load to finish.
-        @Override
-        public void onScrolled(RecyclerView view, int dx, int dy) {
-            int firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
-            int visibleItemCount = view.getChildCount();
-            int totalItemCount = mLinearLayoutManager.getItemCount();
-
-            // If the total item count is zero and the previous isn't, assume the
-            // list is invalidated and should be reset back to initial state
-            if (totalItemCount < previousTotalItemCount) {
-                this.currentPage = this.startingPageIndex;
-                this.previousTotalItemCount = totalItemCount;
-                if (totalItemCount == 0) {
-                    this.loading = true;
-                }
-            }
-            // If it’s still loading, we check to see if the dataset count has
-            // changed, if so we conclude it has finished loading and update the current page
-            // number and total item count.
-            if (loading && (totalItemCount > previousTotalItemCount)) {
-                currentPage = totalItemCount / ITEMS_PER_PAGE;
-                loading = false;
-                previousTotalItemCount = totalItemCount;
-            }
-
-            // If it isn’t currently loading, we check to see if we have breached
-            // the visibleThreshold and need to reload more data.
-            // If we do need to reload some more data, we execute onLoadMore to fetch the data.
-            if (!loading && (totalItemCount - visibleItemCount) <=
-                    (firstVisibleItem + visibleThreshold)) {
-                onLoadMore(currentPage + 1, totalItemCount);
-                loading = true;
-            }
-        }
-
-        // Defines the process for actually loading more data based on page
-        public abstract void onLoadMore(int page, int totalItemsCount);
     }
 }

@@ -10,4 +10,6 @@
     <dimen name="app_bar_height" tools:ignore="UnusedResources">200dp</dimen>
     <dimen name="item_width" tools:ignore="UnusedResources">200dp</dimen>
     <dimen name="text_margin" tools:ignore="UnusedResources">16dp</dimen>
+    <dimen name="detail_backdrop_height">256dp</dimen>
+    <dimen name="card_margin">16dp</dimen>
 </resources>

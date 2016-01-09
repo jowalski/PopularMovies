@@ -4,17 +4,35 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/title_textview"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:padding="16dp"
-        android:background="@color/green"
-        android:text="@string/title_textview_text"
-        android:textSize="@dimen/text_size_title"
-        android:textColor="#ffffff" />
+        android:orientation="horizontal"
+        android:background="@color/green" >
+
+        <CheckBox
+            android:id="@+id/star_favorite"
+            style="?android:attr/starStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/title_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_textview_text"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/text_size_title"
+            android:layout_toRightOf="@+id/star_favorite"
+            android:layout_toEndOf="@+id/star_favorite"
+            android:layout_centerVertical="true"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,8 +75,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/format_rating"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/text_size_medium" />
+                    android:textSize="@dimen/text_size_medium"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/rating_out_of_textview"
@@ -77,10 +95,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
+        android:ellipsize="end"
         android:padding="16dp"
         android:text="@string/plot_textview_text"
-        android:textSize="@dimen/text_size_normal"
-        android:ellipsize="end"
-        android:textIsSelectable="true" />
+        android:textIsSelectable="true"
+        android:textSize="@dimen/text_size_normal" />
 
 </LinearLayout>

@@ -62,8 +62,8 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             mDataValid = true;
             int newSize = newCursor.getCount();
             int oldSize = (oldCursor != null) ? oldCursor.getCount() : 0;
-            notifyItemRangeInserted(oldSize, newSize - oldSize);
-            // notifyDataSetChanged();
+            // notifyItemRangeInserted(oldSize, newSize - oldSize);
+            notifyDataSetChanged();
         } else {
             mRowIdColumn = -1;
             mDataValid = false;
