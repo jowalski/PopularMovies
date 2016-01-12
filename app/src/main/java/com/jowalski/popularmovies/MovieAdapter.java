@@ -9,10 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.jowalski.popularmovies.service.MovieService;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * An ArrayAdapter for the Movie class that uses the Picasso library to
@@ -26,7 +28,7 @@ import butterknife.ButterKnife;
 public class MovieAdapter extends CursorRecyclerViewAdapter<MovieAdapter.ViewHolder> {
 
     private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
-    private static final String MOVIE_ID_EXTRA = "movie_id";
+    public static final String MOVIE_ID_EXTRA = "movie_id";
 
     Context mContext;
 
@@ -36,8 +38,7 @@ public class MovieAdapter extends CursorRecyclerViewAdapter<MovieAdapter.ViewHol
         mContext = context;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.movie_poster_icon) public ImageView mIconView;
         public int mMovieId;
 
@@ -45,17 +46,25 @@ public class MovieAdapter extends CursorRecyclerViewAdapter<MovieAdapter.ViewHol
             super(view);
             ButterKnife.bind(this, view);
             mMovieId = -1;
-            mIconView.setOnClickListener(this);
+            // mIconView.setOnClickListener(this);
         }
 
-        @Override
-        public void onClick(View view) {
-            int position = getLayoutPosition();
+        @OnClick(R.id.movie_poster_icon)
+        public void startDetail(View view) {
             Context context = view.getContext();
             Intent intent = new Intent(context, MovieDetailActivity.class);
-                intent.putExtra(MOVIE_ID_EXTRA, mMovieId);
+            intent.putExtra(MOVIE_ID_EXTRA, mMovieId);
             context.startActivity(intent);
         }
+
+//        @Override
+//        public void onClick(View view) {
+//            int position = getLayoutPosition();
+//            Context context = view.getContext();
+//            Intent intent = new Intent(context, MovieDetailActivity.class);
+//                intent.putExtra(MOVIE_ID_EXTRA, mMovieId);
+//            context.startActivity(intent);
+//        }
     }
 
     @Override
@@ -75,13 +84,26 @@ public class MovieAdapter extends CursorRecyclerViewAdapter<MovieAdapter.ViewHol
         holder.mMovieId = cursor.getInt(MainActivityFragment.COL_MOVIE_TMDB_ID);
         String posterPath = cursor.getString(MainActivityFragment.COL_POSTER_PATH);
 
-        Picasso.with(mContext)
-                .load(posterPath)
+        Glide.with(mContext)
+                .load(constructPosterPath(posterPath))
+                .fitCenter()
+                .dontAnimate()
                 .placeholder(R.drawable.the_arrival_of_a_train)
                 .error(R.drawable.the_kid)
                 .into(holder.mIconView);
 
+//        Picasso.with(mContext)
+//                .load(constructPosterPath(posterPath))
+//                .placeholder(R.drawable.the_arrival_of_a_train)
+//                .error(R.drawable.the_kid)
+//                .into(holder.mIconView);
+
         // TODO: 12/14/15 load accessibility text
     }
+
+    static public String constructPosterPath(String queryPath) {
+        return MovieService.BASE_URL_PATH + MovieService.POSTER_SIZE_W185 + queryPath;
+    }
+
 }
 

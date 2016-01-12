@@ -26,7 +26,6 @@ public class MainActivityFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
-    public static final String DET_ACT_MOVIE_OBJ_INTENT_KEY = "movie_obj";
 
     public static final int SORT_ORDER_BY_POPULARITY = 0;
     public static final int SORT_ORDER_BY_RATING = 1;
@@ -45,10 +44,10 @@ public class MainActivityFragment extends Fragment
             MovieContract.MovieEntry.COLUMN_FAVORITE
     };
 
-    static final int COL_MOVIE_TMDB_ID = 0;
-    static final int COL_MOVIE_TITLE_ID = 1;
-    static final int COL_POSTER_PATH = 2;
-    static final int COL_POPULARITY = 3;
+    public static final int COL_MOVIE_TMDB_ID = 0;
+    public static final int COL_MOVIE_TITLE = 1;
+    public static final int COL_POSTER_PATH = 2;
+    public static final int COL_POPULARITY = 3;
 
     private MovieAdapter mMovieAdapter;
 

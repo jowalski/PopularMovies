@@ -29,12 +29,12 @@ public class MovieService extends IntentService {
     public static final String SORT_BY_VALUE_VOTE = "vote_average.desc";
 
     // fields for constructing the posterPath
-    private static final String BASE_URL_PATH = "http://image.tmdb.org/t/p/";
+    public static final String BASE_URL_PATH = "http://image.tmdb.org/t/p/";
 
     // these are all (?) possible image sizes
     // final String POSTER_SIZE_W92 = "w92";
     // final String POSTER_SIZE_W154 = "w154";
-    private static final String POSTER_SIZE_W185 = "w185";
+    public static final String POSTER_SIZE_W185 = "w185";
     // final String POSTER_SIZE_W342 = "w342";
     // final String POSTER_SIZE_W500 = "w500";
     // final String POSTER_SIZE_W780 = "w780";
@@ -108,8 +108,9 @@ public class MovieService extends IntentService {
         movieValues.put(MovieContract.MovieEntry.COLUMN_ORIG_TITLE, movie.originalTitle);
         movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.overview);
         movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.releaseDate);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH,
-                constructPosterPath(movie.posterPath));
+        // movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH,
+        //         constructPosterPath(movie.posterPath));
+        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.posterPath);
         movieValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, movie.popularity);
         movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.title);
         movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.voteAverage);
